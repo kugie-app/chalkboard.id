@@ -35,7 +35,11 @@
     "package:windows": "bun run scripts/package-windows.js",
     "migration:create": "bun run scripts/create-migration.js",
     "migration:run": "bun run src/lib/run-migrations.ts",
-    "migration:status": "bun run src/lib/migration-status.ts"
+    "migration:status": "bun run src/lib/migration-status.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --maxWorkers=2"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.10.0",
@@ -130,10 +134,14 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/aos": "3.0.7",
     "@types/chance": "1.1.6",
+    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.13",
-    "@types/lowlight": "^0.0.7",
+    "@types/lowlight": "^2.0.1",
     "@types/node": "20",
     "@types/react": "18",
     "@types/react-beautiful-dnd": "^13.1.8",
@@ -142,11 +150,17 @@
     "@types/react-is": "18.3.0",
     "@types/react-slick": "^0.23.10",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@types/supertest": "^6.0.3",
+    "@types/uuid": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "pkg": "^5.8.1",
     "postcss": "8",
+    "supertest": "^7.2.2",
     "tailwindcss": "3.4.4",
+    "ts-jest": "^29.4.6",
     "typescript": "5"
   }
 }

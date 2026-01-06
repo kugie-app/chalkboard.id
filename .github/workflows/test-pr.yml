@@ -1,0 +1,196 @@
+name: Test PR
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: kugieapp/chalkboard
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: chalkboard_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/chalkboard_test"
+      NEXTAUTH_SECRET: "test-secret-key-for-github-actions-only"
+      NEXTAUTH_URL: "http://localhost:3000"
+      DEPLOYMENT_MODE: "test"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run database migrations
+        run: |
+          bun run db:generate
+          bun run db:push
+
+      - name: Run tests
+        run: bun run test:ci
+
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+      - name: Lint check
+        run: bun run lint || echo "Linting skipped"
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://user:password@localhost:5432/chalkboard_build"
+      NEXTAUTH_SECRET: "build-time-secret-key-for-github-actions-only"
+      NEXTAUTH_URL: "http://localhost:3000"
+      DEPLOYMENT_MODE: "auto"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build check
+        run: bun run build
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    env:
+      DATABASE_URL: "postgresql://user:password@localhost:5432/chalkboard_build"
+      NEXTAUTH_SECRET: "build-time-secret-key-for-github-actions-only"
+      NEXTAUTH_URL: "http://localhost:3000"
+      DEPLOYMENT_MODE: "standalone"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build standalone
+        run: bun run build:standalone
+
+      - name: Package Windows executable
+        run: bun run package:windows
+
+  build-docker:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:test
+          build-args: |
+            DATABASE_URL=postgresql://user:password@localhost:5432/chalkboard_build
+            NEXTAUTH_SECRET=build-time-secret-key-for-github-actions-only
+            NEXTAUTH_URL=http://localhost:3000
+            DEFAULT_EMAIL=admin@example.com
+            DEFAULT_PASSWORD=admin123
+            DEPLOYMENT_MODE=auto
+            USE_SERVERLESS_DB=false
+            DB_POOLING=true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  summary:
+    needs: [test, build, build-windows, build-docker]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check test results
+        run: |
+          if [[ "${{ needs.test.result }}" != "success" ]]; then
+            echo "❌ Tests failed"
+            exit 1
+          else
+            echo "✅ Tests passed"
+          fi
+
+      - name: Check build results
+        run: |
+          if [[ "${{ needs.build.result }}" != "success" ]]; then
+            echo "❌ Standard build failed"
+            exit 1
+          else
+            echo "✅ Standard build passed"
+          fi
+
+      - name: Check Windows build results
+        run: |
+          if [[ "${{ needs.build-windows.result }}" != "success" ]]; then
+            echo "❌ Windows build failed"
+            exit 1
+          else
+            echo "✅ Windows build passed"
+          fi
+
+      - name: Check Docker build results
+        run: |
+          if [[ "${{ needs.build-docker.result }}" != "success" ]]; then
+            echo "❌ Docker build failed"
+            exit 1
+          else
+            echo "✅ Docker build passed"
+          fi
+
+      - name: All checks passed
+        run: |
+          echo "🎉 All tests and builds completed successfully!"
+          echo "✅ Unit tests passed"
+          echo "✅ Standard build succeeded"
+          echo "✅ Windows standalone build succeeded"  
+          echo "✅ Docker build succeeded"

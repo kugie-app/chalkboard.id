@@ -158,7 +158,14 @@ export const factories = {
   }),
 };
 
-// Bulk creation helpers
+/**
+ * Create multiple records using a factory and insert them into the specified database table.
+ *
+ * @param factory - Function that returns a record object; called once per item with `overrides`
+ * @param count - Number of items to create
+ * @param overrides - Optional values to merge into each generated item
+ * @returns The array of generated items of type `T`
+ */
 export async function createBulk<T>(
   db: any,
   table: any,

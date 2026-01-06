@@ -6,6 +6,11 @@ import { migrate } from 'drizzle-orm/postgres-js/migrator';
 let testDb: ReturnType<typeof drizzle> | null = null;
 let testConnection: ReturnType<typeof postgres> | null = null;
 
+/**
+ * Lazily initializes a test PostgreSQL database, runs migrations on first call, and returns the initialized Drizzle instance.
+ *
+ * @returns The Drizzle database instance bound to the test connection, or `null` if the test database could not be initialized.
+ */
 export async function getTestDatabase() {
   if (!testDb) {
     const connectionString = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/chalkboard_test';
@@ -26,6 +31,13 @@ export async function getTestDatabase() {
   return testDb;
 }
 
+/**
+ * Clears all records from the test database tables in a dependency-safe order.
+ *
+ * Deletes every row from all application tables used in tests (executing deletes in reverse
+ * dependency order to avoid foreign-key constraint errors). If the test database has not
+ * been initialized, no action is taken.
+ */
 export async function cleanupDatabase() {
   if (testDb) {
     const db = await getTestDatabase();
@@ -45,6 +57,13 @@ export async function cleanupDatabase() {
   }
 }
 
+/**
+ * Closes the test PostgreSQL connection and clears cached database state.
+ *
+ * Ends the underlying raw connection if one exists and resets the cached
+ * drizzle database instance and connection reference to `null`. Has no effect
+ * if no test connection is active.
+ */
 export async function closeTestDatabase() {
   if (testConnection) {
     await testConnection.end();
@@ -53,7 +72,13 @@ export async function closeTestDatabase() {
   }
 }
 
-// Transaction wrapper for test isolation
+/**
+ * Executes a callback inside a database transaction and forces a rollback so changes are not persisted.
+ *
+ * @param fn - Callback invoked with a transaction-scoped database handle.
+ * @returns The value returned by `fn`, or `null` if the transaction was rolled back.
+ * @throws Any error thrown by `fn` or the underlying transaction, other than the forced rollback which is translated to `null`.
+ */
 export async function withTransaction<T>(
   fn: (tx: any) => Promise<T>
 ): Promise<T> {

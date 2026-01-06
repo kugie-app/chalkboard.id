@@ -33,12 +33,24 @@ export const mockCashierSession: Session = {
   expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
 };
 
-// Mock getServerSession
+/**
+ * Creates a Jest mock for next-auth's getServerSession that returns the given session.
+ *
+ * @param session - The Session object (or `null`) the mock should produce; defaults to `mockAdminSession`.
+ * @returns A Jest mock function that returns the provided `session` when invoked.
+ */
 export function mockGetServerSession(session: Session | null = mockAdminSession) {
   return jest.fn().mockResolvedValue(session);
 }
 
-// Create authenticated request
+/**
+ * Create a NextRequest with a mock authentication session attached.
+ *
+ * @param url - The request URL
+ * @param options - Optional RequestInit overrides; provided headers are merged with the mock session header
+ * @param session - The session object to embed in the `x-mock-session` header
+ * @returns A NextRequest whose headers include `x-mock-session` containing the JSON-serialized `session`
+ */
 export function createAuthenticatedRequest(
   url: string,
   options: RequestInit = {},
@@ -55,7 +67,13 @@ export function createAuthenticatedRequest(
   return request;
 }
 
-// Mock auth middleware
+/**
+ * Install a mock for next-auth's getServerSession that resolves to the given session and return the provided handler.
+ *
+ * @param handler - The request handler to return after setting up the mock
+ * @param session - Session value that the mocked `getServerSession` will resolve to; defaults to `mockAdminSession`
+ * @returns The same `handler` that was passed in
+ */
 export async function withAuth(handler: Function, session: Session | null = mockAdminSession) {
   jest.mock('next-auth', () => ({
     getServerSession: jest.fn().mockResolvedValue(session),

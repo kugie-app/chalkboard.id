@@ -1,4 +1,4 @@
-# 🎱 Chalkboard.id v4.0.0
+# 🎱 Chalkboard.id v1.0.0
 
 A comprehensive billiard hall management system built with Next.js 15, React 19, and TypeScript. Manage table sessions, F&B orders, payments, staff, and analytics with ease.
 

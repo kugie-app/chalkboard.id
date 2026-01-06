@@ -1,0 +1,38 @@
+.bg-lightbtn {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.container-1218 {
+    max-width: 1218px;
+    padding: 0 20px;
+}
+
+
+.marquee1-group {
+    animation: marquee 45s linear infinite;
+}
+
+.marquee2-group {
+    animation: marquee2 45s linear infinite;
+}
+
+
+@keyframes marquee {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    100% {
+        transform: translate3d(-2086px, 0, 0);
+    }
+}
+
+@keyframes marquee2 {
+    0% {
+        transform: translate3d(-2086px, 0, 0)
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0)
+    }
+}

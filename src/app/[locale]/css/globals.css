@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@import './layouts/container.css';
+@import './layouts/sidebar.css';
+@import './layouts/horizontal.css';
+@import './layouts/header.css';
+@import './pages/dashboards.css';
+@import './pages/widgets.css';
+@import './pages/landingpage.css';
+@import './pages/frontpages.css';
+@import './pages/auth.css';
+@import './pages/app.css';
+@import './theme/default-colors.css';
+@import './theme/dark.css';
+@import './override/reboot.css';
+@import './layouts/rtl.css';
+
+@layer components {
+  .container {
+    @apply max-w-[1200px];
+  }
+
+  .landingpage .container {
+    @apply max-w-[1320px];
+  }
+
+  html {
+    @apply overflow-x-hidden;
+  }
+
+  body {
+    @apply text-sm overflow-x-hidden text-bodytext;
+  }
+
+  .dropdown {
+    @apply shadow-md bg-white dark:bg-dark relative rounded-md dark:shadow-dark-md overflow-hidden;
+  }
+
+  .card-title {
+    @apply text-lg font-semibold text-dark dark:text-white mb-1
+  }
+
+  .card-subtitle {
+    @apply text-15 text-bodytext 
+  }
+
+
+  /*heading text color*/
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-dark dark:text-white font-semibold;
+  }
+
+  .border-ld {
+    @apply border-border dark:border-darkborder;
+  }
+
+  .bg-hover {
+    @apply hover:bg-lighthover hover:dark:bg-darkmuted
+  }
+
+  .form-control input {
+    @apply rounded-md border border-border dark:border-darkborder bg-transparent dark:bg-transparent w-full text-sm;
+  }
+  .form-control-chat input{
+    @apply rounded-md border-0 bg-transparent dark:bg-transparent w-full text-sm;
+  }
+  .form-control-chat input:focus{
+    @apply !border-0 bg-transparent dark:bg-transparent w-full text-sm  ring-transparent dark:ring-transparent;
+  }
+
+  .form-control-rounded input {
+    @apply rounded-full border border-border dark:border-darkborder bg-transparent dark:bg-transparent w-full text-sm;
+  }
+  .form-control-rounded input:focus {
+    @apply border-primary dark:border-primary outline-none shadow-none ring-offset-0 ring-transparent;
+  }
+
+  .form-control-textarea{
+    @apply !rounded-md border border-border dark:border-darkborder bg-transparent dark:bg-transparent w-full text-sm p-4;
+  }
+  .form-control-textarea:focus {
+    @apply border-primary dark:border-primary outline-none shadow-none ring-offset-0 ring-transparent;
+  }
+
+  .form-control input:focus {
+    @apply border-primary dark:border-primary outline-none shadow-none ring-offset-0 ring-transparent;
+  }
+
+  .form-control-input {
+    @apply rounded-md border border-border dark:border-darkborder bg-transparent dark:bg-transparent w-full text-sm;
+  }
+  .form-control-input:focus {
+    @apply border-primary dark:border-primary outline-none shadow-none ring-offset-0 ring-transparent;
+  }
+
+  .form-control-validation input{
+    @apply rounded-md
+  }
+
+  .form-rounded-md input{
+    @apply rounded-md
+  }
+
+  .input-center input{
+    @apply text-center;
+  }
+  
+  .elipse{
+    @apply w-[18px] h-[10px]
+  }
+
+  input::placeholder {
+    @apply text-bodytext
+  }
+
+  .select-option select{
+    @apply bg-muted border-0 text-darklink dark:text-white/80 py-2 ps-4 pe-9 w-auto  focus:border-0 focus:ring-0 font-medium;
+  }
+
+  .select-md select{
+    @apply border-ld bg-transparent dark:bg-darkgray w-full text-sm rounded-md focus:border-primary dark:focus:border-primary focus:ring-0 ;
+  }
+
+  .checkbox{
+    @apply h-[18px] w-[18px] border border-border dark:border-darkborder bg-transparent focus:ring-0 focus:ring-offset-0
+  }
+ 
+  .text-primary-ld{
+    @apply hover:text-primary dark:hover:text-primary;
+  }
+
+  /* Apps */
+  .left-part{
+    @apply w-80 border-e border-ld p-6;
+  }
+  .btn-circle{
+    @apply h-8 w-8 !rounded-full flex justify-center items-center p-0;
+  }
+  .btn-circle-hover{
+    @apply h-9 w-9 flex justify-center items-center !rounded-full hover:bg-lightprimary hover:text-primary cursor-pointer bg-transparent
+  }
+  .text-ld{
+    @apply text-dark dark:text-white;
+  }
+  .avatar-full img{
+    @apply w-full h-full;
+  }
+  .sorting button{
+    @apply bg-transparent text-dark dark:text-white p-0
+  }
+  .sorting button:hover{
+    @apply bg-transparent
+  }
+  .sorting button span{
+    @apply p-0
+  }
+  .sorting ul li {
+    @apply px-4 py-2
+  } 
+  .sorting ul li button:hover {
+    @apply hover:text-primary
+  }
+
+  /* Button Hover Color Set */
+  button.bg-primary {
+    @apply hover:bg-primaryemphasis
+  }
+
+  button.bg-secondary {
+    @apply hover:bg-secondaryemphasis
+  }
+
+  button.bg-info {
+    @apply hover:bg-infoemphasis
+  }
+
+  button.bg-error {
+    @apply hover:bg-erroremphasis
+  }
+
+  button.bg-success {
+    @apply hover:bg-successemphasis
+  }
+
+  button.bg-warning {
+    @apply hover:bg-warningemphasis
+  }
+
+  /* Headlessui */
+  .ui-button{
+    @apply flex items-stretch justify-between text-center py-2.5 px-5 text-white text-center font-medium rounded-md 
+  }
+  .ui-button-small{
+    @apply flex items-stretch justify-between text-center py-2 px-6 text-white text-center font-medium rounded-md 
+  }
+  .ui-dropdown{
+    @apply text-ld  w-full !max-w-56 bg-white dark:bg-dark  shadow-md dark:shadow-dark-md text-start rounded-sm py-3
+  }
+  .ui-dropdown-item{
+    @apply flex w-full gap-3 cursor-pointer items-center justify-start px-4 py-2 text-sm text-ld hover:text-primary bg-hover  focus:bg-hover focus:outline-none
+  }
+  .ui-dropdown-animation{
+    @apply origin-top-right transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0
+  }
+  .ui-form-control {
+    @apply border border-border dark:border-darkborder bg-transparent dark:bg-transparent w-full text-sm ;
+  }
+  .ui-form-control:focus {
+    @apply border-primary dark:border-primary outline-none shadow-none ring-offset-0 ring-transparent dark:ring-transparent focus:dark:ring-0;
+  } 
+  .ui-checkbox{
+    @apply h-[18px] w-[18px] border border-border dark:border-darkborder bg-white dark:bg-transparent data-[checked]:bg-primary dark:data-[checked]:bg-primary rounded cursor-pointer focus:ring-0 focus:ring-offset-0 outline-none
+  }
+
+
+}

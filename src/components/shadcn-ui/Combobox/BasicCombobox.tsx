@@ -1,0 +1,108 @@
+
+"use client"
+import React from 'react'
+import CardBox from '../../shared/CardBox'
+import { Check, ChevronsUpDown } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/shadcn-ui/Default-Ui/button"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/shadcn-ui/Default-Ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/shadcn-ui/Default-Ui/popover"
+import BasicComboboxCode from './code/BasicComboCode'
+const frameworks = [
+    {
+        value: "next.js",
+        label: "Next.js",
+    },
+    {
+        value: "sveltekit",
+        label: "SvelteKit",
+    },
+    {
+        value: "nuxt.js",
+        label: "Nuxt.js",
+    },
+    {
+        value: "remix",
+        label: "Remix",
+    },
+    {
+        value: "astro",
+        label: "Astro",
+    },
+]
+
+
+
+
+const BasicCombobox = () => {
+    const [open, setOpen] = React.useState(false)
+    const [value, setValue] = React.useState("")
+    return (
+        <CardBox>
+            <div className="flex items-center justify-between">
+                <h4 className="text-lg font-semibold">Basic Combobox</h4>
+                <BasicComboboxCode/>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 mt-4">
+                <Popover open={open} onOpenChange={setOpen} >
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={open}
+                            className="w-full justify-between"
+                        >
+                            {value
+                                ? frameworks.find((framework) => framework.value === value)?.label
+                                : "Select framework..."}
+                            <ChevronsUpDown className="opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className=" p-0 ">
+                        <Command>
+                            <CommandInput placeholder="Search framework..." />
+                            <CommandList>
+                                <CommandEmpty>No framework found.</CommandEmpty>
+                                <CommandGroup>
+                                    {frameworks.map((framework) => (
+                                        <CommandItem
+                                        
+                                            key={framework.value}
+                                            value={framework.value}
+                                            onSelect={(currentValue) => {
+                                                setValue(currentValue === value ? "" : currentValue)
+                                                setOpen(false)
+                                            }}
+                                        >
+                                            {framework.label}
+                                            <Check
+                                                className={cn(
+                                                    "ml-auto",
+                                                    value === framework.value ? "opacity-100" : "opacity-0"
+                                                )}
+                                            />
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+            </div>
+        </CardBox>
+    )
+}
+
+export default BasicCombobox

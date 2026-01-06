@@ -1,0 +1,997 @@
+{
+  "auth": {
+    "signin": {
+      "title": "Sign In",
+      "subtitle": "Sign in to your account",
+      "systemSubtitle": "Billiard Hall Management System",
+      "email": "Email",
+      "password": "Password",
+      "helperText": "Don't have an account? Contact administrator",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Enter your password",
+      "loading": "Signing in...",
+      "signin": "Sign In",
+      "demoCredentials": "Demo Credentials",
+      "invalidCredentials": "Invalid email or password",
+      "signInError": "An error occurred during sign in"
+    }
+  },
+  "TablesManagement": {
+    "title": "Table Management",
+    "subtitle": "Manage your billiard tables and sessions",
+    "addNewTable": "Add New Table",
+    "loading": "Loading tables...",
+    "noTables": {
+      "title": "No Tables Found",
+      "subtitle": "Get started by creating your first billiard table",
+      "button": "Create Your First Table"
+    }
+  },
+  "TableCard": {
+    "occupied": "ACTIVE",
+    "available": "EMPTY",
+    "maintenance": "MAINTENANCE",
+    "reserved": "RESERVED",
+    "startTime": "Start",
+    "endTime": "End",
+    "duration": "Duration",
+    "cost": "Cost",
+    "billableHours": "{count, plural, =1 {# hour} other {# hours}}",
+    "billableMinutes": "{count, plural, =1 {# minute} other {# minutes}}",
+    "fnbButton": "F&B",
+    "stopButton": "Stop",
+    "startButton": "Start",
+    "editButton": "Edit",
+    "deleteButton": "Delete",
+    "perMinute": "Per-minute",
+    "hourly": "Hourly"
+  },
+  "Dashboard": {
+    "title": "ChalkBoard Dashboard",
+    "subtitle": "Welcome back, {name}",
+    "loading": "Loading dashboard...",
+    "redirecting": "Redirecting to sign in...",
+    "stats": {
+      "totalTables": "Total Tables",
+      "occupied": "Occupied",
+      "available": "Available",
+      "todaysRevenue": "Today's Revenue"
+    },
+    "tableStatusBoard": {
+      "title": "Table Status Board",
+      "refresh": "Refresh",
+      "rate": "Rate",
+      "customer": "Customer",
+      "duration": "Duration",
+      "billableHours": "Billable Hours",
+      "cost": "Cost",
+      "endSession": "End Session",
+      "startSession": "Start Session"
+    },
+    "noTables": "No tables found",
+    "createFirstTable": "Create Your First Table",
+    "buttons": {
+      "posSystem": "POS System",
+      "addTable": "Add Table"
+    },
+    "billingModal": {
+      "title": "Session Billing Summary",
+      "sessionDetails": "Session Details",
+      "customer": "Customer",
+      "duration": "Duration",
+      "billableHours": "Billable Hours",
+      "billableMinutes": "Billable Minutes",
+      "tableCost": "Table Cost",
+      "fnbOrders": "Food & Beverage Orders",
+      "fnbSubtotal": "F&B Subtotal",
+      "totalAmount": "Total Amount",
+      "processPayment": "Process Payment",
+      "closeButton": "Close"
+    }
+  },
+  "SessionModal": {
+    "startTitle": "Start Session - {tableName}",
+    "customerName": "Customer Name",
+    "customerNamePlaceholder": "Enter customer name",
+    "plannedDuration": "Planned Duration (minutes)",
+    "estimatedCost": "Estimated cost: {cost}",
+    "startButton": "Start Session",
+    "cancelButton": "Cancel",
+    "durationOptions": {
+      "30minutes": "30 minutes",
+      "60minutes": "1 hour",
+      "90minutes": "1.5 hours",
+      "120minutes": "2 hours",
+      "180minutes": "3 hours"
+    },
+    "customerLabel": "Customer Name",
+    "customerPlaceholder": "Enter customer name",
+    "plannedDurationLabel": "Planned Duration (minutes)",
+    "modeLabel": "Session Mode",
+    "modeOptions": {
+      "open": "Open Table (count up)",
+      "planned": "Planned (count down)"
+    },
+    "pricingPackageLabel": "Pricing Package",
+    "selectPackage": "Select pricing package",
+    "packageRequired": "Please select a pricing package"
+  },
+  "POS": {
+    "title": "Enhanced POS System",
+    "subtitle": "Advanced Point of Sale - Food & Beverage with Draft Orders",
+    "loading": "Loading POS...",
+    "cartItems": "Cart Items",
+    "draftOrders": "Draft Orders ({count})",
+    "menu": {
+      "allItems": "All Items",
+      "outofstock": "Out of Stock",
+      "lowstock": "Low Stock",
+      "instock": "In Stock",
+      "stock": "Stock: {quantity} {unit}",
+      "noItemsFound": "No items found in this category"
+    },
+    "cart": {
+      "title": "Cart",
+      "empty": "Your cart is empty",
+      "addItems": "Add items from the menu",
+      "clear": "Clear",
+      "subtotal": "Subtotal",
+      "tax": "Tax (10%)",
+      "total": "Total"
+    },
+    "checkout": {
+      "button": "Checkout ({total})",
+      "title": "Enhanced Checkout",
+      "orderType": "Order Type *",
+      "orderTypes": {
+        "standalone": {
+          "title": "Standalone",
+          "description": "Immediate sale"
+        },
+        "waiting": {
+          "title": "Waiting",
+          "description": "Save as draft"
+        },
+        "tableSession": {
+          "title": "Table Session",
+          "description": "Add to bill"
+        },
+        "pendingTransaction": {
+          "title": "Pending Transaction",
+          "description": "Add to existing"
+        }
+      },
+      "customerName": "Customer Name *",
+      "customerNamePlaceholder": "Enter customer name",
+      "phoneNumber": "Phone Number",
+      "phonePlaceholder": "Optional for draft tracking",
+      "tableAssignment": "Table Assignment *",
+      "selectTable": "Select table",
+      "pendingTransaction": "Pending Transaction *",
+      "selectTransaction": "Select pending transaction",
+      "noPendingTransactions": "No pending transactions available. Create a standalone order first to generate a pending transaction.",
+      "staffMember": "Staff Member *",
+      "selectStaff": "Select staff member",
+      "notes": "Notes",
+      "notesPlaceholder": "Special instructions or customer preferences...",
+      "orderSummary": "Order Summary",
+      "buttons": {
+        "processPayment": "Process Payment",
+        "saveAsDraft": "Save as Draft",
+        "addToTableBill": "Add to Table Bill",
+        "addToTransaction": "Add to Transaction",
+        "cancel": "Cancel"
+      },
+      "contextInfo": {
+        "standalone": {
+          "title": "Standalone Order",
+          "description": "This will be processed immediately as a separate transaction with payment."
+        },
+        "waiting": {
+          "title": "Draft Order",
+          "description": "This order will be saved as a draft and can be assigned to a table later."
+        },
+        "tableSession": {
+          "title": "Table Assignment",
+          "description": "This order will be added to the table's bill. Payment will be processed when the session ends."
+        },
+        "pendingTransaction": {
+          "title": "Pending Transaction Assignment",
+          "description": "This order will be added to the selected pending transaction. The transaction total will be updated automatically."
+        }
+      }
+    },
+    "draftOrdersModal": {
+      "title": "Draft Orders Management - Assign to Tables or Transactions",
+      "noOrders": "No draft orders",
+      "ordersWillAppear": "Draft orders will appear here when customers are waiting",
+      "staffMember": "Staff Member *",
+      "assignmentOptions": "Assignment Options:",
+      "assignToTable": {
+        "title": "Assign to Active Table",
+        "button": "Assign to Table",
+        "noTables": "No active tables available"
+      },
+      "assignToTransaction": {
+        "title": "Assign to Pending Transaction",
+        "button": "Assign to Transaction",
+        "noTransactions": "No pending transactions available. Create a standalone order first."
+      },
+      "selectStaff": "Select staff member",
+      "selectTable": "Select table...",
+      "selectTransaction": "Select transaction...",
+      "close": "Close"
+    },
+    "orderCreated": "Order created successfully",
+    "draftOrderCreated": "Draft order created successfully",
+    "tableOrderCreated": "Table order created successfully",
+    "pendingTransactionOrderCreated": "Pending transaction order created successfully",
+    "orderNumber": "Order Number: #{orderNumber}"
+  },
+  "FnB": {
+    "title": "Enhanced F&B Management",
+    "subtitle": "Comprehensive food & beverage management with draft orders and real-time updates",
+    "loading": "Loading...",
+    "refresh": "Refresh",
+    "filters": "Filters",
+    "search": "Search...",
+    "advancedFilters": {
+      "status": "Status",
+      "allStatus": "All Status",
+      "staffMember": "Staff Member",
+      "allStaff": "All Staff",
+      "dateRange": "Date Range",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "allTime": "All Time",
+      "clearFilters": "Clear Filters"
+    },
+    "paymentWorkflow": {
+      "title": "Payment Workflow Guide",
+      "standalone": "Standalone Orders: Automatically create payment records. Check Transactions page to process payment.",
+      "draft": "Draft Orders: Can be assigned to active tables or pending transactions for consolidated billing.",
+      "table": "Table Orders: Automatically included in table session billing when session ends."
+    },
+    "tabs": {
+      "orders": "Orders ({count})",
+      "categories": "Categories",
+      "items": "Items"
+    },
+    "orders": {
+      "title": "All Orders",
+      "drafts": "{count} Drafts",
+      "columns": {
+        "orderNumber": "Order #",
+        "customer": "Customer",
+        "table": "Table",
+        "staff": "Staff",
+        "total": "Total",
+        "status": "Status",
+        "payment": "Payment",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "pending": "Pending",
+        "billed": "Billed",
+        "paid": "Paid",
+        "cancelled": "Cancelled"
+      },
+      "paymentStatuses": {
+        "readyToPay": "Ready to Pay",
+        "paid": "Paid",
+        "noPayment": "No Payment",
+        "pending": "Pending"
+      },
+      "noOrders": "No orders found"
+    },
+    "categories": {
+      "title": "Categories ({count})",
+      "addCategory": "Add Category",
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "status": "Status",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "modal": {
+        "addTitle": "Add New Category",
+        "editTitle": "Edit Category",
+        "name": "Name *",
+        "description": "Description",
+        "active": "Active",
+        "create": "Create",
+        "update": "Update",
+        "cancel": "Cancel",
+        "deleteConfirmation": "Are you sure you want to delete this category?"
+      }
+    },
+    "items": {
+      "title": "Items ({count})",
+      "addItem": "Add Item",
+      "columns": {
+        "name": "Name",
+        "category": "Category",
+        "price": "Price",
+        "stock": "Stock",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "modal": {
+        "addTitle": "Add New Item",
+        "editTitle": "Edit Item",
+        "name": "Name *",
+        "category": "Category *",
+        "selectCategory": "Select Category",
+        "description": "Description",
+        "price": "Price *",
+        "cost": "Cost",
+        "stockQuantity": "Stock Quantity",
+        "minStockLevel": "Min Stock Level",
+        "unit": "Unit",
+        "units": {
+          "pcs": "Pieces",
+          "kg": "Kilograms",
+          "g": "Grams",
+          "l": "Liters",
+          "ml": "Milliliters",
+          "dozen": "Dozen"
+        },
+        "active": "Active",
+        "create": "Create",
+        "update": "Update",
+        "cancel": "Cancel",
+        "deleteConfirmation": "Are you sure you want to delete this item?"
+      }
+    },
+    "orderDetail": {
+      "title": "Order Details - {orderNumber}",
+      "customer": "Customer",
+      "status": "Status",
+      "subtotal": "Subtotal",
+      "tax": "Tax",
+      "total": "Total",
+      "notes": "Notes",
+      "staffMember": "Staff Member",
+      "date": "Date",
+      "close": "Close"
+    },
+    "draftAssignment": {
+      "title": "Assign Draft Order - {orderNumber}",
+      "orderDetails": "Order Details",
+      "customer": "Customer",
+      "total": "Total",
+      "items": "Items",
+      "selectTable": "Select Table",
+      "noOccupiedTables": "No occupied tables available for assignment",
+      "cancel": "Cancel"
+    },
+    "draftTransactionAssignment": {
+      "title": "Assign Draft Order to Pending Transaction - {orderNumber}",
+      "selectTransaction": "Select Pending Transaction",
+      "noTransactions": "No pending transactions available for assignment. Create a standalone order first to generate a pending transaction."
+    }
+  },
+  "Transactions": {
+    "title": "Transactions",
+    "subtitle": "Manage payments and transaction history",
+    "loading": "Loading transactions...",
+    "refresh": "Refresh",
+    "export": "Export",
+    "filters": {
+      "status": "Status",
+      "allStatus": "All Status",
+      "dateRange": "Date Range",
+      "allTime": "All Time",
+      "today": "Today",
+      "last7Days": "Last 7 Days",
+      "lastMonth": "Last Month",
+      "search": "Search",
+      "searchPlaceholder": "Search by transaction ID, order ID, or payment method..."
+    },
+    "stats": {
+      "totalTransactions": "Total Transactions",
+      "successful": "Successful",
+      "pending": "Pending",
+      "revenue": "Revenue"
+    },
+    "table": {
+      "columns": {
+        "transactionId": "Transaction ID",
+        "customer": "Customer",
+        "tableOrders": "Table/Orders",
+        "amount": "Amount",
+        "status": "Status",
+        "paymentMethod": "Payment Method",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "walkInCustomer": "Walk-in Customer",
+      "notSpecified": "Not specified",
+      "table": "Table",
+      "order": "Order",
+      "items": "item{count, plural, =1 {} other {s}}",
+      "minutes": "min"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "success": "Success",
+      "failed": "Failed",
+      "cancelled": "Cancelled",
+      "unknown": "Unknown"
+    },
+    "noTransactions": "No transactions found",
+    "processPayment": {
+      "title": "Process Payment",
+      "customerInfo": "Customer Information",
+      "name": "Name",
+      "phone": "Phone",
+      "orderSummary": "Order Summary for Staff Confirmation",
+      "tableSessions": "Table Sessions:",
+      "duration": "Duration",
+      "customer": "Customer",
+      "fnbItems": "F&B Items Ordered:",
+      "servedBy": "Served by",
+      "notes": "Notes",
+      "qty": "Qty",
+      "item": "Item",
+      "category": "Category",
+      "unitPrice": "Unit Price",
+      "subtotal": "Subtotal",
+      "orderSubtotal": "Order Subtotal",
+      "tax": "Tax",
+      "orderTotal": "Order Total",
+      "paymentBreakdown": "Payment Breakdown",
+      "transactionNumber": "Transaction Number",
+      "tableAmount": "Table Amount",
+      "fnbAmount": "F&B Amount",
+      "discountAmount": "Discount Amount",
+      "taxAmount": "Tax Amount",
+      "totalAmount": "Total Amount",
+      "staffConfirmation": "Staff Confirmation: Please verify with the customer that this matches their order before processing the payment.",
+      "confirmPaid": "Confirm & Mark as Paid",
+      "cancelPayment": "Cancel Payment",
+      "close": "Close"
+    },
+    "transactionDetail": {
+      "title": "Transaction Details",
+      "transactionNumber": "Transaction Number",
+      "customerName": "Customer Name",
+      "phoneNumber": "Phone Number",
+      "notProvided": "Not provided",
+      "tableSessions": "Table Sessions",
+      "table": "Table",
+      "duration": "Duration",
+      "startTime": "Start Time",
+      "ordersLinked": "{count} F&B order{count, plural, =1 {} other {s}} linked",
+      "fnbOrders": "F&B Orders",
+      "orderNumber": "Order #",
+      "orderDate": "Order Date",
+      "orderItems": "Order Items:",
+      "paymentSummary": "Payment Summary",
+      "paymentMethod": "Payment Method",
+      "currency": "Currency",
+      "createdAt": "Created At",
+      "lastUpdated": "Last Updated",
+      "midtransResponse": "Midtrans Response",
+      "print": "Print Receipt",
+      "close": "Close",
+      "printLanguagePrompt": "Select print language:",
+      "printInEnglish": "Print in English",
+      "printInIndonesian": "Print in Indonesian",
+      "receipt": {
+        "title": "CHALKBOARD BILLIARD",
+        "subtitle": "Receipt",
+        "transaction": "Transaction",
+        "date": "Date",
+        "customer": "Customer",
+        "phone": "Phone",
+        "status": "Status",
+        "tableSessions": "TABLE SESSIONS",
+        "table": "Table",
+        "minutes": "min",
+        "foodBeverage": "FOOD & BEVERAGE",
+        "notes": "Notes",
+        "paymentSummary": "PAYMENT SUMMARY",
+        "tableAmount": "Table Amount",
+        "fnbAmount": "F&B Amount",
+        "discount": "Discount",
+        "tax": "Tax",
+        "total": "TOTAL",
+        "footer": {
+          "thankYou": "Thank you for visiting!",
+          "businessName": "ChalkBoard Billiard Hall",
+          "generated": "Generated"
+        }
+      }
+    }
+  },
+  "Alerts": {
+    "tableCreatedSuccess": "Table created successfully",
+    "tableUpdatedSuccess": "Table updated successfully",
+    "tableDeletedSuccess": "Table deleted successfully",
+    "sessionStartedSuccess": "Session started successfully",
+    "sessionEndedSuccess": "Session ended successfully",
+    "paymentRecordCreated": "Payment record created. Please process payment in Transactions page.",
+    "fnbOrderCreatedSuccess": "Order #{orderNumber} created successfully! Added to {tableName}'s bill.",
+    "genericError": "An unexpected error occurred",
+    "itemOutOfStock": "Item is out of stock",
+    "notEnoughStock": "Not enough stock available",
+    "cartEmpty": "Cart is empty",
+    "customerNameRequired": "Customer name is required",
+    "staffMemberRequired": "Staff member must be selected",
+    "selectPendingTransaction": "Please select a pending transaction",
+    "selectTable": "Please select a table",
+    "selectStaff": "Please select a staff member",
+    "orderAssignedToTable": "Draft order assigned to table successfully",
+    "orderAssignedToTransaction": "Draft order assigned to transaction {transactionNumber} successfully",
+    "orderCreatedSuccess": "{orderType} #{orderNumber} created successfully",
+    "orderCreatedWithPayment": "{orderType} #{orderNumber} created successfully! Payment record {transactionNumber} is pending in Transactions page.",
+    "paymentMarkedSuccess": "Payment marked as successful",
+    "paymentCancelled": "Payment cancelled successfully",
+    "categoryCreatedSuccess": "Category created successfully",
+    "categoryUpdatedSuccess": "Category updated successfully",
+    "categoryDeletedSuccess": "Category deleted successfully",
+    "itemCreatedSuccess": "Item created successfully",
+    "itemUpdatedSuccess": "Item updated successfully",
+    "itemDeletedSuccess": "Item deleted successfully",
+    "failedToLoadData": "Failed to load data",
+    "failedToSaveCategory": "Failed to save category",
+    "failedToDeleteCategory": "Failed to delete category",
+    "failedToSaveItem": "Failed to save item",
+    "failedToDeleteItem": "Failed to delete item",
+    "failedToProcessOrder": "Failed to process order",
+    "failedToAssignDraftOrder": "Failed to assign draft order",
+    "failedToUpdatePayment": "Failed to update payment status",
+    "failedToProcessPayment": "Failed to process payment",
+    "failedToCancelPayment": "Failed to cancel payment",
+    "failedToLoadPayments": "Failed to load payments",
+    "durationTypeUpdatedSuccess": "Duration type updated successfully",
+    "failedToUpdateDurationType": "Failed to update duration type",
+    "durationUpdatedSuccess": "Duration updated successfully",
+    "failedToUpdateDuration": "Failed to update duration",
+    "sessionMovedSuccess": "Session moved to {tableName} successfully",
+    "paymentProcessedSuccess": "Payment processed successfully",
+    "failedToLoadFnBData": "Failed to load F&B data",
+    "itemOutOfStockNamed": "{itemName} is out of stock",
+    "notEnoughStockAvailable": "Not enough stock available",
+    "tableSessionNotFound": "Table session not found",
+    "cartIsEmpty": "Cart is empty",
+    "pleaseSelectStaffMember": "Please select a staff member",
+    "orderCreatedAddedToBill": "Order #{orderNumber} created successfully! Added to {tableName}'s bill.",
+    "failedToCreateOrder": "Failed to create order",
+    "noActiveSessionFound": "No active session found for this table",
+    "failedToCreateTable": "Failed to create table",
+    "failedToUpdateTable": "Failed to update table",
+    "failedToDeleteTable": "Failed to delete table",
+    "failedToStartSession": "Failed to start session",
+    "failedToUpdatePaymentStatus": "Failed to update payment status",
+    "paymentCancelledSuccess": "Payment cancelled successfully",
+    "failedToEndSession": "Failed to end session",
+    "taxSettingsUpdatedSuccess": "Tax settings updated successfully",
+    "failedToUpdateTaxSettings": "Failed to update tax settings"
+  },
+  "Analytics": {
+    "title": "Enhanced Analytics Dashboard",
+    "subtitle": "Comprehensive insights into your billiard hall & F&B performance",
+    "breadcrumbHome": "Home",
+    "breadcrumbAnalytics": "Enhanced Analytics",
+    "refresh": "Refresh",
+    "overview": "Overview",
+    "fnbAnalytics": "F&B Analytics",
+    "operations": "Operations",
+    "customerInsights": "Customer Insights",
+    "timeRanges": {
+      "last7DaysDaily": "Last 7 days (Daily)",
+      "last14DaysDaily": "Last 14 days (Daily)",
+      "last30DaysDaily": "Last 30 days (Daily)",
+      "last30DaysWeekly": "Last 30 days (Weekly)",
+      "last90DaysWeekly": "Last 90 days (Weekly)",
+      "last90DaysMonthly": "Last 90 days (Monthly)"
+    },
+    "cards": {
+      "totalRevenue": "Total Revenue",
+      "tableRevenue": "Table Revenue",
+      "fnbRevenue": "F&B Revenue",
+      "activeTables": "Active Tables",
+      "sessions": "sessions",
+      "orders": "orders",
+      "utilization": "utilization",
+      "vsLastPeriod": "vs last period"
+    },
+    "charts": {
+      "revenueBreakdownTrends": "Revenue Breakdown Trends",
+      "quickStats": "Quick Stats",
+      "avgFnbOrderValue": "Avg F&B Order Value",
+      "customerSatisfaction": "Customer Satisfaction",
+      "avgSessionDuration": "Avg Session Duration",
+      "topSellingItems": "Top Selling Items",
+      "categoryPerformance": "Category Performance",
+      "draftOrderPerformance": "Draft Order Performance",
+      "staffPerformance": "Staff Performance",
+      "operationalKPIs": "Operational KPIs",
+      "hourlyActivityDistribution": "Hourly Activity Distribution",
+      "sessionsRevenueAndFnbByHour": "Sessions, Revenue, and F&B Orders by Hour",
+      "customerOverview": "Customer Overview",
+      "visitFrequencyDistribution": "Visit Frequency Distribution"
+    },
+    "labels": {
+      "sold": "sold",
+      "avgValue": "Avg Value",
+      "totalDrafts": "Total Drafts",
+      "assigned": "Assigned",
+      "conversionRate": "Conversion Rate",
+      "avgWaitTime": "Avg Wait Time",
+      "staffMember": "Staff Member",
+      "role": "Role",
+      "revenue": "Revenue",
+      "rating": "Rating",
+      "tableUtilization": "Table Utilization",
+      "inventoryAlerts": "Inventory Alerts",
+      "peakHours": "Peak Hours",
+      "totalCustomers": "Total Customers",
+      "returningCustomers": "Returning Customers",
+      "retention": "retention",
+      "avgSpendPerCustomer": "Avg Spend per Customer",
+      "min": "min",
+      "hour": "Hour"
+    },
+    "tooltip": {
+      "tableRevenue": "Table Revenue",
+      "fnbRevenue": "F&B Revenue",
+      "totalRevenue": "Total Revenue",
+      "sessions": "Sessions",
+      "fnbOrders": "F&B Orders"
+    }
+  },
+  "Stock": {
+    "title": "Stock Report",
+    "subtitle": "Comprehensive inventory management and stock analysis",
+    "breadcrumbHome": "Home",
+    "breadcrumbStock": "Stock Report",
+    "refresh": "Refresh",
+    "timeRanges": {
+      "last7Days": "Last 7 days",
+      "last14Days": "Last 14 days",
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days"
+    },
+    "cards": {
+      "totalItems": "Total Items",
+      "stockValue": "Stock Value",
+      "lowStockItems": "Low Stock Items",
+      "outOfStock": "Out of Stock",
+      "categories": "categories",
+      "totalInventoryValue": "Total inventory value",
+      "needAttention": "Need attention",
+      "urgentReorder": "Urgent reorder"
+    },
+    "sections": {
+      "stockAlerts": "Stock Alerts",
+      "categoryOverview": "Category Overview",
+      "currentStockLevels": "Current Stock Levels",
+      "stockMovement": "Stock Movement (Last {days} days)"
+    },
+    "table": {
+      "itemName": "Item Name",
+      "category": "Category",
+      "currentStock": "Current Stock",
+      "minLevel": "Min Level",
+      "status": "Status",
+      "unit": "Unit",
+      "stockValue": "Stock Value",
+      "totalSold": "Total Sold",
+      "revenue": "Revenue",
+      "dailyAvg": "Daily Avg",
+      "orders": "Orders",
+      "lastOrder": "Last Order"
+    },
+    "status": {
+      "outOfStock": "Out of Stock",
+      "lowStock": "Low Stock",
+      "mediumStock": "Medium Stock",
+      "highStock": "High Stock",
+      "unknown": "Unknown",
+      "normal": "Normal",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "labels": {
+      "items": "items",
+      "reorder": "Reorder",
+      "totalValue": "Total Value",
+      "na": "N/A"
+    }
+  },
+  "Users": {
+    "title": "Staff Management",
+    "subtitle": "Manage your team members and their roles",
+    "addStaffMember": "Add Staff Member",
+    "editStaffMember": "Edit Staff Member",
+    "updateStaffMember": "Update Staff Member",
+    "addNewStaffMember": "Add New Staff Member",
+    "confirmDeactivation": "Confirm Deactivation",
+    "filters": {
+      "allStaff": "All Staff",
+      "activeOnly": "Active Only",
+      "inactiveOnly": "Inactive Only"
+    },
+    "table": {
+      "name": "Name",
+      "role": "Role",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete"
+    },
+    "roles": {
+      "staff": "Staff",
+      "manager": "Manager",
+      "admin": "Admin",
+      "cashier": "Cashier",
+      "waiter": "Waiter",
+      "chef": "Chef",
+      "supervisor": "Supervisor"
+    },
+    "form": {
+      "fullName": "Full Name",
+      "enterFullName": "Enter full name",
+      "role": "Role",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "totalStaffMembers": "Total: {count} staff members",
+      "noStaffMembersFound": "No staff members found",
+      "deactivateConfirmation": "Are you sure you want to deactivate {name}?",
+      "deactivateDescription": "This will make them unavailable for new assignments but preserve historical data.",
+      "yesDeactivate": "Yes, deactivate"
+    }
+  },
+  "Modals": {
+    "tableModal": {
+      "createTitle": "Create New Table",
+      "tableName": "Table Name",
+      "tableNamePlaceholder": "e.g. Table 1",
+      "billingType": "Billing Type",
+      "hourlyBilling": "Hourly Billing",
+      "perMinuteBilling": "Per-Minute Billing",
+      "hourlyRate": "Hourly Rate (IDR)",
+      "hourlyRatePlaceholder": "e.g. 100000",
+      "hourlyRateHelper": "Full session hours will be rounded up",
+      "perMinuteRate": "Per-Minute Rate (IDR)",
+      "perMinuteRatePlaceholder": "e.g. 1500",
+      "perMinuteRateHelper": "Session minutes rounded up after 30 seconds",
+      "status": "Status",
+      "statusPlaceholder": "Select status",
+      "cancelButton": "Cancel",
+      "createButton": "Create Table",
+      "updateButton": "Update Table",
+      "deleteButton": "Delete",
+      "editTitle": "Edit Table"
+    },
+    "editTitle": "Edit Table",
+    "deleteTitle": "Delete Table",
+    "deleteConfirmation": "Are you sure you want to delete <strong>{tableName}</strong>? This action cannot be undone.",
+    "startSessionTitle": "Start Session - {tableName}",
+    "billingTitle": "Session Billing Summary",
+    "fnbTitle": "F&B Order - {tableName}",
+    "customerLabel": "Customer Name",
+    "hourlyRateLabel": "Hourly Rate (IDR)",
+    "statusLabel": "Status",
+    "plannedDurationLabel": "Planned Duration (minutes)",
+    "cancelButton": "Cancel",
+    "createButton": "Create Table",
+    "updateButton": "Update Table",
+    "deleteButton": "Delete"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "tables": "Tables",
+    "f&b": "F&B",
+    "menumanagement": "Menu Management",
+    "possystem": "POS System",
+    "pos": "POS",
+    "revenue": "Revenue",
+    "stockreport": "Stock Report",
+    "transactions": "Transactions",
+    "usermanagement": "User Management",
+    "adminsettings": "Admin Settings",
+    "pricingpackages": "Pricing Packages",
+    "pricingPackages": "Pricing Packages"
+  },
+  "Common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "update": "Update",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "active": "Active",
+    "inactive": "Inactive",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "close": "Close",
+    "view": "View",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "description": "Description",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "date": "Date",
+    "time": "Time",
+    "customer": "Customer",
+    "staff": "Staff",
+    "table": "Table",
+    "order": "Order",
+    "payment": "Payment",
+    "transaction": "Transaction",
+    "items": "items",
+    "clear": "Clear",
+    "menuItems": "Menu Items",
+    "currentOrders": "Current Orders",
+    "newOrder": "New Order",
+    "cartIsEmpty": "Cart is empty",
+    "staffMember": "Staff Member",
+    "selectStaff": "Select Staff",
+    "duration": "Duration",
+    "move": "Move",
+    "durationManagement": "Duration Management",
+    "loadingFnBMenu": "Loading F&B menu...",
+    "moveSessionToAnotherTable": "Move Session to Another Table",
+    "currentSession": "Current Session",
+    "currentTable": "Current Table",
+    "selectTargetTable": "Select Target Table",
+    "loadingAvailableTables": "Loading available tables...",
+    "noAvailableTablesFound": "No available tables found",
+    "selectATable": "Select a table...",
+    "targetTable": "Target Table",
+    "rate": "Rate",
+    "available": "Available",
+    "moveSessionWarning": "Moving the session will transfer all pending F&B orders to the new table. The billing will continue with the same duration and rate structure.",
+    "movingSession": "Moving Session...",
+    "moveSession": "Move Session",
+    "failedToFetchAvailableTables": "Failed to fetch available tables",
+    "errorFetchingTables": "Error fetching tables",
+    "failedToMoveSession": "Failed to move session",
+    "errorMovingSession": "Error moving session",
+    "changeToPerMinute": "Change to Per Minute",
+    "changeToHourly": "Change to Hourly",
+    "currentDuration": "Current Duration",
+    "minutes": "minutes",
+    "hours": "hours",
+    "min": "min",
+    "sec": "sec",
+    "billingType": "Billing Type",
+    "hourlyRate": "Hourly Rate",
+    "perMinuteRate": "Per Minute Rate",
+    "billableHours": "Billable Hours",
+    "durationAndBillingType": "Duration & Billing Type",
+    "durationMinutes": "Duration (minutes)",
+    "failedToRecalculateBilling": "Failed to recalculate billing",
+    "errorRecalculatingBilling": "Error recalculating billing",
+    "currency": {
+      "compact": {
+        "thousand": "K",
+        "million": "M",
+        "billion": "B"
+      }
+    }
+  },
+  "AdminPage": {
+    "title": "Admin Settings",
+    "subtitle": "Manage system-wide configuration and billing settings",
+    "billingSystem": {
+      "title": "Table Billing System",
+      "subtitle": "Configure billing for each table individually using the table management interface.",
+      "perMinuteAvailable": "Per-Minute Billing Available",
+      "features": {
+        "individualConfig": "Individual Configuration: Each table can be set as hourly or per-minute billing",
+        "hourlyBilling": "Hourly Billing: Session time rounded up to next full hour",
+        "perMinuteBilling": "Per-Minute Billing: Session time billed per minute (rounded up after 30 seconds)",
+        "easyManagement": "Easy Management: Change billing type when creating or editing tables"
+      },
+      "howToTitle": "How to Configure Tables:",
+      "steps": {
+        "step1": "Go to Tables → Create New Table or Edit existing table",
+        "step2": "Select Billing Type: \"Hourly Billing\" or \"Per-Minute Billing\"",
+        "step3": "Enter the rate for your selected billing type",
+        "step4": "Each table will bill according to its individual configuration"
+      }
+    },
+    "systemInfo": {
+      "title": "System Information:",
+      "version": "Version:",
+      "perMinuteBilling": "Per-minute billing:",
+      "individualTableConfig": "Individual table config:",
+      "apiEndpoints": "API Endpoints:",
+      "active": "Active",
+      "enabled": "Enabled"
+    },
+    "taxSettings": {
+      "title": "Tax Settings (PPN)",
+      "subtitle": "Configure tax settings for table sessions and F&B orders",
+      "enableTax": "Enable Tax Collection",
+      "taxPercentage": "Tax Percentage (%)",
+      "taxName": "Tax Name/Label",
+      "applyTaxTo": "Apply Tax To:",
+      "tableSessions": "Table Sessions",
+      "fnbOrders": "Food & Beverage Orders",
+      "note": "Note:",
+      "noteText": "Current tax rate in Indonesia is 11% (PPN). Changes will apply to new orders and sessions only.",
+      "saving": "Saving...",
+      "saveTaxSettings": "Save Tax Settings"
+    }
+  },
+  "PricingPackages": {
+    "title": "Pricing Packages",
+    "subtitle": "Manage your table pricing packages",
+    "addPackage": "Add Package",
+    "categories": {
+      "all": "All Packages",
+      "hourly": "Hourly Packages",
+      "per_minute": "Per Minute Packages"
+    },
+    "table": {
+      "name": "Package Name",
+      "category": "Category",
+      "rate": "Rate",
+      "status": "Status",
+      "default": "Default",
+      "actions": "Actions"
+    },
+    "form": {
+      "addTitle": "Add New Package",
+      "editTitle": "Edit Package",
+      "name": "Package Name",
+      "namePlaceholder": "e.g., MALAM, WEEKEND, VIP",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description for this package",
+      "category": "Category",
+      "selectCategory": "Select category",
+      "hourlyRate": "Hourly Rate",
+      "perMinuteRate": "Per Minute Rate",
+      "isDefault": "Set as default for this category",
+      "isActive": "Active",
+      "sortOrder": "Sort Order",
+      "create": "Create Package",
+      "update": "Update Package",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "messages": {
+      "createSuccess": "Package created successfully",
+      "updateSuccess": "Package updated successfully",
+      "deleteSuccess": "Package deleted successfully",
+      "deleteError": "Cannot delete package that is in use",
+      "loadError": "Failed to load packages",
+      "saveError": "Failed to save package",
+      "confirmDelete": "Are you sure you want to delete this package?"
+    }
+  }
+}

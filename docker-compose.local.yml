@@ -1,0 +1,77 @@
+# Docker Compose for local PostgreSQL (Standalone mode)
+version: '3.8'
+
+services:
+  # PostgreSQL database for standalone deployment
+  postgres:
+    image: postgres:15
+    container_name: chalkboard-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: chalkboard
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - chalkboard-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chalkboard"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # pgAdmin for database management (optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: chalkboard-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@chalkboard.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - chalkboard-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: chalkboard-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - chalkboard-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    name: chalkboard_postgres_data
+  pgadmin_data:
+    name: chalkboard_pgadmin_data
+  redis_data:
+    name: chalkboard_redis_data
+
+networks:
+  chalkboard-network:
+    name: chalkboard-network
+    driver: bridge

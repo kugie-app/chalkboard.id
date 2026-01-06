@@ -1,0 +1,15 @@
+.page-wrapper {
+    margin-left: calc(0px + 260px);
+    transition: .2s ease-in;
+    margin-right: 15px;
+}
+
+@media screen and (max-width:1279px) {
+    .page-wrapper{
+        margin-left: 15px;
+    }
+}
+
+/* [data-sidebar-type="mini-sidebar"] .page-wrapper-sub {
+    margin-left: 15px;
+} */

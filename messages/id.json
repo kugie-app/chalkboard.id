@@ -1,0 +1,998 @@
+{
+  "auth": {
+    "signin": {
+      "title": "Masuk",
+      "subtitle": "Masuk ke akun Anda",
+      "systemSubtitle": "Sistem Manajemen Billiard Hall",
+      "email": "Email",
+      "password": "Kata Sandi",
+      "helperText": "Belum punya akun? Hubungi administrator",
+      "emailPlaceholder": "Masukkan email Anda",
+      "passwordPlaceholder": "Masukkan kata sandi Anda",
+      "loading": "Memuat...",
+      "signin": "Masuk",
+      "demoCredentials": "Kredensial Demo",
+      "invalidCredentials": "Email atau kata sandi tidak valid",
+      "signInError": "Terjadi kesalahan saat masuk"
+    }
+  },
+  "TablesManagement": {
+    "title": "Manajemen Meja",
+    "subtitle": "Kelola meja biliar dan sesi Anda",
+    "addNewTable": "Tambah Meja Baru",
+    "loading": "Memuat meja...",
+    "noTables": {
+      "title": "Tidak Ada Meja Ditemukan",
+      "subtitle": "Mulailah dengan membuat meja biliar pertama Anda",
+      "button": "Buat Meja Pertama Anda"
+    }
+  },
+  "TableCard": {
+    "occupied": "AKTIF",
+    "available": "KOSONG",
+    "maintenance": "PERAWATAN",
+    "reserved": "DIPESAN",
+    "startTime": "Mulai",
+    "endTime": "Selesai",
+    "duration": "Durasi",
+    "cost": "Biaya",
+    "billableHours": "{count} jam",
+    "billableMinutes": "{count} menit",
+    "fnbButton": "F&B",
+    "stopButton": "Stop",
+    "startButton": "Mulai",
+    "editButton": "Ubah",
+    "deleteButton": "Hapus",
+    "perMinute": "Per-menit",
+    "hourly": "Per-jam"
+  },
+  "Dashboard": {
+    "title": "Dasbor ChalkBoard",
+    "subtitle": "Selamat datang kembali, {name}",
+    "loading": "Memuat dasbor...",
+    "redirecting": "Mengalihkan ke halaman masuk...",
+    "stats": {
+      "totalTables": "Total Meja",
+      "occupied": "Terisi",
+      "available": "Tersedia",
+      "todaysRevenue": "Pendapatan Hari Ini"
+    },
+    "tableStatusBoard": {
+      "title": "Status Meja",
+      "refresh": "Refresh",
+      "rate": "Tarif",
+      "customer": "Pelanggan",
+      "duration": "Durasi",
+      "billableHours": "Jam Tagihan",
+      "cost": "Biaya",
+      "endSession": "Akhiri Sesi",
+      "startSession": "Mulai Sesi"
+    },
+    "noTables": "Tidak ada meja ditemukan",
+    "createFirstTable": "Buat Meja Pertama Anda",
+    "buttons": {
+      "posSystem": "Kasir (Point of Sales F&B)",
+      "addTable": "Tambah Meja"
+    },
+    "billingModal": {
+      "title": "Ringkasan Tagihan Sesi",
+      "sessionDetails": "Detail Sesi",
+      "customer": "Pelanggan",
+      "duration": "Durasi",
+      "billableHours": "Jam Tagihan",
+      "billableMinutes": "Menit Tagihan",
+      "tableCost": "Biaya Meja",
+      "fnbOrders": "Pesanan Makanan & Minuman",
+      "fnbSubtotal": "Subtotal F&B",
+      "totalAmount": "Total Jumlah",
+      "processPayment": "Proses Pembayaran",
+      "closeButton": "Tutup"
+    }
+  },
+  "SessionModal": {
+    "startTitle": "Mulai Sesi - {tableName}",
+    "customerName": "Nama Pelanggan",
+    "customerNamePlaceholder": "Masukkan nama pelanggan",
+    "plannedDuration": "Durasi Terencana (menit)",
+    "estimatedCost": "Perkiraan biaya: {cost}",
+    "startButton": "Mulai Sesi",
+    "cancelButton": "Batal",
+    "durationOptions": {
+      "30minutes": "30 menit",
+      "60minutes": "60 menit",
+      "90minutes": "90 menit",
+      "120minutes": "120 menit",
+      "180minutes": "180 menit"
+    },
+    "customerLabel": "Nama Pelanggan",
+    "customerPlaceholder": "Masukkan nama pelanggan",
+    "plannedDurationLabel": "Durasi Terencana (menit)",
+    "modeLabel": "Mode Sesi",
+    "modeOptions": {
+      "open": "Open Table (hitung naik)",
+      "planned": "Terencana (hitung mundur)"
+    },
+    "pricingPackageLabel": "Paket Harga",
+    "selectPackage": "Pilih paket harga",
+    "packageRequired": "Silakan pilih paket harga"
+  },
+  "POS": {
+    "title": "Kasir (Point of Sales F&B)",
+    "subtitle": "Sistem Kasir untuk F&B",
+    "loading": "Memuat POS...",
+    "cartItems": "Item Keranjang",
+    "draftOrders": "Pesanan Draft ({count})",
+    "menu": {
+      "allItems": "Semua Item",
+      "outofstock": "Stok Habis",
+      "lowstock": "Stok Rendah",
+      "instock": "Tersedia",
+      "stock": "Stok: {quantity} {unit}",
+      "noItemsFound": "Tidak ada item ditemukan dalam kategori ini"
+    },
+    "cart": {
+      "title": "Keranjang",
+      "empty": "Keranjang Anda kosong",
+      "addItems": "Tambahkan item dari menu",
+      "clear": "Kosongkan",
+      "subtotal": "Subtotal",
+      "tax": "Pajak (10%)",
+      "total": "Total"
+    },
+    "checkout": {
+      "button": "Checkout ({total})",
+      "title": "Checkout Lanjutan",
+      "orderType": "Jenis Pesanan *",
+      "orderTypes": {
+        "standalone": {
+          "title": "Mandiri",
+          "description": "Penjualan langsung"
+        },
+        "waiting": {
+          "title": "Menunggu",
+          "description": "Simpan sebagai draft"
+        },
+        "tableSession": {
+          "title": "Sesi Meja",
+          "description": "Tambah ke tagihan"
+        },
+        "pendingTransaction": {
+          "title": "Transaksi Tertunda",
+          "description": "Tambah ke yang ada"
+        }
+      },
+      "customerName": "Nama Pelanggan *",
+      "customerNamePlaceholder": "Masukkan nama pelanggan",
+      "phoneNumber": "Nomor Telepon",
+      "phonePlaceholder": "Opsional untuk pelacakan draft",
+      "tableAssignment": "Penetapan Meja *",
+      "selectTable": "Pilih meja",
+      "pendingTransaction": "Transaksi Tertunda *",
+      "selectTransaction": "Pilih transaksi tertunda",
+      "noPendingTransactions": "Tidak ada transaksi tertunda. Buat pesanan mandiri terlebih dahulu untuk menghasilkan transaksi tertunda.",
+      "staffMember": "Anggota Staf *",
+      "selectStaff": "Pilih anggota staf",
+      "notes": "Catatan",
+      "notesPlaceholder": "Instruksi khusus atau preferensi pelanggan...",
+      "orderSummary": "Ringkasan Pesanan",
+      "buttons": {
+        "processPayment": "Proses Pembayaran",
+        "saveAsDraft": "Simpan sebagai Draft",
+        "addToTableBill": "Tambah ke Tagihan Meja",
+        "addToTransaction": "Tambah ke Transaksi",
+        "cancel": "Batal"
+      },
+      "contextInfo": {
+        "standalone": {
+          "title": "Pesanan Mandiri",
+          "description": "Ini akan diproses langsung sebagai transaksi terpisah dengan pembayaran."
+        },
+        "waiting": {
+          "title": "Pesanan Draft",
+          "description": "Pesanan ini akan disimpan sebagai draft dan dapat ditetapkan ke meja nanti."
+        },
+        "tableSession": {
+          "title": "Penetapan Meja",
+          "description": "Pesanan ini akan ditambahkan ke tagihan meja. Pembayaran akan diproses saat sesi berakhir."
+        },
+        "pendingTransaction": {
+          "title": "Penetapan Transaksi Tertunda",
+          "description": "Pesanan ini akan ditambahkan ke transaksi tertunda yang dipilih. Total transaksi akan diperbarui secara otomatis."
+        }
+      }
+    },
+    "draftOrdersModal": {
+      "title": "Manajemen Pesanan Draft - Tetapkan ke Meja atau Transaksi",
+      "noOrders": "Tidak ada pesanan draft",
+      "ordersWillAppear": "Pesanan draft akan muncul di sini saat pelanggan menunggu",
+      "staffMember": "Anggota Staf *",
+      "assignmentOptions": "Opsi Penetapan:",
+      "assignToTable": {
+        "title": "Tetapkan ke Meja Aktif",
+        "button": "Tetapkan ke Meja",
+        "noTables": "Tidak ada meja aktif tersedia"
+      },
+      "assignToTransaction": {
+        "title": "Tetapkan ke Transaksi Tertunda",
+        "button": "Tetapkan ke Transaksi",
+        "noTransactions": "Tidak ada transaksi tertunda tersedia. Buat pesanan mandiri terlebih dahulu."
+      },
+      "selectStaff": "Pilih anggota staf",
+      "selectTable": "Pilih meja...",
+      "selectTransaction": "Pilih transaksi...",
+      "close": "Tutup"
+    },
+    "orderCreated": "Pesanan berhasil dibuat",
+    "draftOrderCreated": "Pesanan draft berhasil dibuat",
+    "tableOrderCreated": "Pesanan meja berhasil dibuat",
+    "pendingTransactionOrderCreated": "Pesanan transaksi tertunda berhasil dibuat",
+    "orderNumber": "Nomor Pesanan: #{orderNumber}"
+  },
+  "FnB": {
+    "title": "Manajemen F&B Lanjutan",
+    "subtitle": "Manajemen makanan & minuman komprehensif dengan pesanan draft dan pembaruan real-time",
+    "loading": "Memuat...",
+    "refresh": "Refresh",
+    "filters": "Filter",
+    "search": "Cari...",
+    "advancedFilters": {
+      "status": "Status",
+      "allStatus": "Semua Status",
+      "staffMember": "Anggota Staf",
+      "allStaff": "Semua Staf",
+      "dateRange": "Rentang Tanggal",
+      "today": "Hari Ini",
+      "thisWeek": "Minggu Ini",
+      "thisMonth": "Bulan Ini",
+      "allTime": "Sepanjang Waktu",
+      "clearFilters": "Hapus Filter"
+    },
+    "paymentWorkflow": {
+      "title": "Panduan Alur Pembayaran",
+      "standalone": "Pesanan Mandiri: Otomatis membuat catatan pembayaran. Periksa halaman Transaksi untuk memproses pembayaran.",
+      "draft": "Pesanan Draft: Dapat ditetapkan ke meja aktif atau transaksi tertunda untuk penagihan terpadu.",
+      "table": "Pesanan Meja: Otomatis disertakan dalam penagihan sesi meja saat sesi berakhir."
+    },
+    "tabs": {
+      "orders": "Pesanan ({count})",
+      "categories": "Kategori",
+      "items": "Item"
+    },
+    "orders": {
+      "title": "Semua Pesanan",
+      "drafts": "{count} Draft",
+      "columns": {
+        "orderNumber": "No. Pesanan",
+        "customer": "Pelanggan",
+        "table": "Meja",
+        "staff": "Staf",
+        "total": "Total",
+        "status": "Status",
+        "payment": "Pembayaran",
+        "date": "Tanggal",
+        "actions": "Aksi"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "pending": "Tertunda",
+        "billed": "Ditagih",
+        "paid": "Dibayar",
+        "cancelled": "Dibatalkan"
+      },
+      "paymentStatuses": {
+        "readyToPay": "Siap Bayar",
+        "paid": "Dibayar",
+        "noPayment": "Tanpa Pembayaran",
+        "pending": "Tertunda"
+      },
+      "noOrders": "Tidak ada pesanan ditemukan"
+    },
+    "categories": {
+      "title": "Kategori ({count})",
+      "addCategory": "Tambah Kategori",
+      "columns": {
+        "name": "Nama",
+        "description": "Deskripsi",
+        "status": "Status",
+        "created": "Dibuat",
+        "actions": "Aksi"
+      },
+      "modal": {
+        "addTitle": "Tambah Kategori Baru",
+        "editTitle": "Ubah Kategori",
+        "name": "Nama *",
+        "description": "Deskripsi",
+        "active": "Aktif",
+        "create": "Buat",
+        "update": "Perbarui",
+        "cancel": "Batal",
+        "deleteConfirmation": "Apakah Anda yakin ingin menghapus kategori ini?"
+      }
+    },
+    "items": {
+      "title": "Item ({count})",
+      "addItem": "Tambah Item",
+      "columns": {
+        "name": "Nama",
+        "category": "Kategori",
+        "price": "Harga",
+        "stock": "Stok",
+        "status": "Status",
+        "actions": "Aksi"
+      },
+      "modal": {
+        "addTitle": "Tambah Item Baru",
+        "editTitle": "Ubah Item",
+        "name": "Nama *",
+        "category": "Kategori *",
+        "selectCategory": "Pilih Kategori",
+        "description": "Deskripsi",
+        "price": "Harga *",
+        "cost": "Biaya",
+        "stockQuantity": "Jumlah Stok",
+        "minStockLevel": "Level Stok Minimum",
+        "unit": "Satuan",
+        "units": {
+          "pcs": "Buah",
+          "kg": "Kilogram",
+          "g": "Gram",
+          "l": "Liter",
+          "ml": "Mililiter",
+          "dozen": "Lusin"
+        },
+        "active": "Aktif",
+        "create": "Buat",
+        "update": "Perbarui",
+        "cancel": "Batal",
+        "deleteConfirmation": "Apakah Anda yakin ingin menghapus item ini?"
+      }
+    },
+    "orderDetail": {
+      "title": "Detail Pesanan - {orderNumber}",
+      "customer": "Pelanggan",
+      "status": "Status",
+      "subtotal": "Subtotal",
+      "tax": "Pajak",
+      "total": "Total",
+      "notes": "Catatan",
+      "staffMember": "Anggota Staf",
+      "date": "Tanggal",
+      "close": "Tutup"
+    },
+    "draftAssignment": {
+      "title": "Tetapkan Pesanan Draft - {orderNumber}",
+      "orderDetails": "Detail Pesanan",
+      "customer": "Pelanggan",
+      "total": "Total",
+      "items": "Item",
+      "selectTable": "Pilih Meja",
+      "noOccupiedTables": "Tidak ada meja terisi tersedia untuk penetapan",
+      "cancel": "Batal"
+    },
+    "draftTransactionAssignment": {
+      "title": "Tetapkan Pesanan Draft ke Transaksi Tertunda - {orderNumber}",
+      "selectTransaction": "Pilih Transaksi Tertunda",
+      "noTransactions": "Tidak ada transaksi tertunda tersedia untuk penetapan. Buat pesanan mandiri terlebih dahulu untuk menghasilkan transaksi tertunda."
+    }
+  },
+  "Transactions": {
+    "title": "Transaksi",
+    "subtitle": "Kelola pembayaran dan riwayat transaksi",
+    "loading": "Memuat transaksi...",
+    "refresh": "Refresh",
+    "export": "Ekspor",
+    "filters": {
+      "status": "Status",
+      "allStatus": "Semua Status",
+      "dateRange": "Rentang Tanggal",
+      "allTime": "Sepanjang Waktu",
+      "today": "Hari Ini",
+      "last7Days": "7 Hari Terakhir",
+      "lastMonth": "Bulan Lalu",
+      "search": "Cari",
+      "searchPlaceholder": "Cari berdasarkan ID transaksi, ID pesanan, atau metode pembayaran..."
+    },
+    "stats": {
+      "totalTransactions": "Total Transaksi",
+      "successful": "Berhasil",
+      "pending": "Tertunda",
+      "revenue": "Pendapatan"
+    },
+    "table": {
+      "columns": {
+        "transactionId": "ID Transaksi",
+        "customer": "Pelanggan",
+        "tableOrders": "Meja/Pesanan",
+        "amount": "Jumlah",
+        "status": "Status",
+        "paymentMethod": "Metode Pembayaran",
+        "date": "Tanggal",
+        "actions": "Aksi"
+      },
+      "walkInCustomer": "Pelanggan Walk-in",
+      "notSpecified": "Tidak ditentukan",
+      "table": "Meja",
+      "order": "Pesanan",
+      "items": "item",
+      "minutes": "mnt"
+    },
+    "statuses": {
+      "pending": "Tertunda",
+      "success": "Berhasil",
+      "failed": "Gagal",
+      "cancelled": "Dibatalkan",
+      "unknown": "Tidak Diketahui"
+    },
+    "noTransactions": "Tidak ada transaksi ditemukan",
+    "processPayment": {
+      "title": "Proses Pembayaran",
+      "customerInfo": "Informasi Pelanggan",
+      "name": "Nama",
+      "phone": "Telepon",
+      "orderSummary": "Ringkasan Pesanan untuk Konfirmasi Staf",
+      "tableSessions": "Sesi Meja:",
+      "duration": "Durasi",
+      "customer": "Pelanggan",
+      "fnbItems": "Item F&B yang Dipesan:",
+      "servedBy": "Dilayani oleh",
+      "notes": "Catatan",
+      "qty": "Jml",
+      "item": "Item",
+      "category": "Kategori",
+      "unitPrice": "Harga Satuan",
+      "subtotal": "Subtotal",
+      "orderSubtotal": "Subtotal Pesanan",
+      "tax": "Pajak",
+      "orderTotal": "Total Pesanan",
+      "paymentBreakdown": "Rincian Pembayaran",
+      "transactionNumber": "Nomor Transaksi",
+      "tableAmount": "Jumlah Meja",
+      "fnbAmount": "Jumlah F&B",
+      "discountAmount": "Jumlah Diskon",
+      "taxAmount": "Jumlah Pajak",
+      "totalAmount": "Jumlah Total",
+      "staffConfirmation": "Konfirmasi Staf: Silakan verifikasi dengan pelanggan bahwa ini sesuai dengan pesanan mereka sebelum memproses pembayaran.",
+      "confirmPaid": "Selesaikan Pembayaran",
+      "cancelPayment": "Batalkan",
+      "close": "Tutup"
+    },
+    "transactionDetail": {
+      "title": "Detail Transaksi",
+      "transactionNumber": "Nomor Transaksi",
+      "customerName": "Nama Pelanggan",
+      "phoneNumber": "Nomor Telepon",
+      "notProvided": "Tidak disediakan",
+      "tableSessions": "Sesi Meja",
+      "table": "Meja",
+      "duration": "Durasi",
+      "startTime": "Waktu Mulai",
+      "ordersLinked": "{count} pesanan F&B terkait",
+      "fnbOrders": "Pesanan F&B",
+      "orderNumber": "No. Pesanan",
+      "orderDate": "Tanggal Pesanan",
+      "orderItems": "Item Pesanan:",
+      "paymentSummary": "Ringkasan Pembayaran",
+      "paymentMethod": "Metode Pembayaran",
+      "currency": "Mata Uang",
+      "createdAt": "Dibuat Pada",
+      "lastUpdated": "Terakhir Diperbarui",
+      "midtransResponse": "Respons Midtrans",
+      "print": "Cetak Struk",
+      "close": "Tutup",
+      "printLanguagePrompt": "Pilih bahasa cetak:",
+      "printInEnglish": "Cetak dalam Bahasa Inggris",
+      "printInIndonesian": "Cetak dalam Bahasa Indonesia",
+      "receipt": {
+        "title": "BILLIARD CHALKBOARD",
+        "subtitle": "Struk Pembayaran",
+        "transaction": "Transaksi",
+        "date": "Tanggal",
+        "customer": "Pelanggan",
+        "phone": "Telepon",
+        "status": "Status",
+        "tableSessions": "SESI MEJA",
+        "table": "Meja",
+        "minutes": "mnt",
+        "foodBeverage": "MAKANAN & MINUMAN",
+        "notes": "Catatan",
+        "paymentSummary": "RINGKASAN PEMBAYARAN",
+        "tableAmount": "Biaya Meja",
+        "fnbAmount": "Biaya F&B",
+        "discount": "Diskon",
+        "tax": "Pajak",
+        "total": "TOTAL",
+        "footer": {
+          "thankYou": "Terima kasih atas kunjungan Anda!",
+          "businessName": "Billiard Hall ChalkBoard",
+          "generated": "Dicetak"
+        }
+      }
+    }
+  },
+  "Alerts": {
+    "tableCreatedSuccess": "Meja berhasil dibuat",
+    "tableUpdatedSuccess": "Meja berhasil diperbarui",
+    "tableDeletedSuccess": "Meja berhasil dihapus",
+    "sessionStartedSuccess": "Sesi berhasil dimulai",
+    "sessionEndedSuccess": "Sesi berhasil diakhiri",
+    "paymentRecordCreated": "Catatan pembayaran dibuat. Silakan proses pembayaran di halaman Transaksi.",
+    "fnbOrderCreatedSuccess": "Pesanan #{orderNumber} berhasil dibuat! Ditambahkan ke tagihan {tableName}.",
+    "genericError": "Terjadi kesalahan yang tidak terduga",
+    "itemOutOfStock": "Item stok habis",
+    "notEnoughStock": "Stok tidak mencukupi",
+    "cartEmpty": "Keranjang kosong",
+    "customerNameRequired": "Nama pelanggan wajib diisi",
+    "staffMemberRequired": "Anggota staf harus dipilih",
+    "selectPendingTransaction": "Silakan pilih transaksi tertunda",
+    "selectTable": "Silakan pilih meja",
+    "selectStaff": "Silakan pilih anggota staf",
+    "orderAssignedToTable": "Pesanan draft berhasil ditetapkan ke meja",
+    "orderAssignedToTransaction": "Pesanan draft berhasil ditetapkan ke transaksi {transactionNumber}",
+    "orderCreatedSuccess": "{orderType} #{orderNumber} berhasil dibuat",
+    "orderCreatedWithPayment": "{orderType} #{orderNumber} berhasil dibuat! Catatan pembayaran {transactionNumber} tertunda di halaman Transaksi.",
+    "paymentMarkedSuccess": "Pembayaran ditandai sebagai berhasil",
+    "paymentCancelled": "Pembayaran berhasil dibatalkan",
+    "categoryCreatedSuccess": "Kategori berhasil dibuat",
+    "categoryUpdatedSuccess": "Kategori berhasil diperbarui",
+    "categoryDeletedSuccess": "Kategori berhasil dihapus",
+    "itemCreatedSuccess": "Item berhasil dibuat",
+    "itemUpdatedSuccess": "Item berhasil diperbarui",
+    "itemDeletedSuccess": "Item berhasil dihapus",
+    "failedToLoadData": "Gagal memuat data",
+    "failedToSaveCategory": "Gagal menyimpan kategori",
+    "failedToDeleteCategory": "Gagal menghapus kategori",
+    "failedToSaveItem": "Gagal menyimpan item",
+    "failedToDeleteItem": "Gagal menghapus item",
+    "failedToAssignDraftOrder": "Gagal menetapkan pesanan draft",
+    "failedToUpdatePayment": "Gagal memperbarui status pembayaran",
+    "durationTypeUpdatedSuccess": "Jenis durasi berhasil diperbarui",
+    "failedToUpdateDurationType": "Gagal memperbarui jenis durasi",
+    "durationUpdatedSuccess": "Durasi berhasil diperbarui",
+    "failedToUpdateDuration": "Gagal memperbarui durasi",
+    "sessionMovedSuccess": "Sesi berhasil dipindahkan ke {tableName}",
+    "paymentProcessedSuccess": "Pembayaran berhasil diproses",
+    "failedToLoadFnBData": "Gagal memuat data F&B",
+    "itemOutOfStockNamed": "{itemName} stok habis",
+    "notEnoughStockAvailable": "Stok tidak mencukupi",
+    "tableSessionNotFound": "Sesi meja tidak ditemukan",
+    "cartIsEmpty": "Keranjang kosong",
+    "pleaseSelectStaffMember": "Silakan pilih anggota staf",
+    "orderCreatedAddedToBill": "Pesanan #{orderNumber} berhasil dibuat! Ditambahkan ke tagihan {tableName}.",
+    "failedToCreateOrder": "Gagal membuat pesanan",
+    "failedToProcessOrder": "Gagal memproses pesanan",
+    "noActiveSessionFound": "Tidak ada sesi aktif ditemukan untuk meja ini",
+    "failedToCreateTable": "Gagal membuat meja",
+    "failedToUpdateTable": "Gagal memperbarui meja",
+    "failedToDeleteTable": "Gagal menghapus meja",
+    "failedToStartSession": "Gagal memulai sesi",
+    "failedToLoadPayments": "Gagal memuat pembayaran",
+    "failedToUpdatePaymentStatus": "Gagal memperbarui status pembayaran",
+    "failedToProcessPayment": "Gagal memproses pembayaran",
+    "paymentCancelledSuccess": "Pembayaran berhasil dibatalkan",
+    "failedToCancelPayment": "Gagal membatalkan pembayaran",
+    "failedToEndSession": "Gagal mengakhiri sesi",
+    "taxSettingsUpdatedSuccess": "Pengaturan pajak berhasil diperbarui",
+    "failedToUpdateTaxSettings": "Gagal memperbarui pengaturan pajak"
+  },
+  "Analytics": {
+    "title": "Dasbor Analytics Lanjutan",
+    "subtitle": "Wawasan komprehensif tentang performa billiard hall & F&B Anda",
+    "breadcrumbHome": "Beranda",
+    "breadcrumbAnalytics": "Analytics Lanjutan",
+    "refresh": "Muat Ulang",
+    "overview": "Ringkasan",
+    "fnbAnalytics": "Analytics F&B",
+    "operations": "Operasional",
+    "customerInsights": "Wawasan Pelanggan",
+    "timeRanges": {
+      "last7DaysDaily": "7 hari terakhir (Harian)",
+      "last14DaysDaily": "14 hari terakhir (Harian)",
+      "last30DaysDaily": "30 hari terakhir (Harian)",
+      "last30DaysWeekly": "30 hari terakhir (Mingguan)",
+      "last90DaysWeekly": "90 hari terakhir (Mingguan)",
+      "last90DaysMonthly": "90 hari terakhir (Bulanan)"
+    },
+    "cards": {
+      "totalRevenue": "Total Pendapatan",
+      "tableRevenue": "Pendapatan Meja",
+      "fnbRevenue": "Pendapatan F&B",
+      "activeTables": "Meja Aktif",
+      "sessions": "sesi",
+      "orders": "pesanan",
+      "utilization": "utilisasi",
+      "vsLastPeriod": "vs periode lalu"
+    },
+    "charts": {
+      "revenueBreakdownTrends": "Tren Rincian Pendapatan",
+      "quickStats": "Statistik Cepat",
+      "avgFnbOrderValue": "Rata-rata Nilai Pesanan F&B",
+      "customerSatisfaction": "Kepuasan Pelanggan",
+      "avgSessionDuration": "Rata-rata Durasi Sesi",
+      "topSellingItems": "Item Terlaris",
+      "categoryPerformance": "Performa Kategori",
+      "draftOrderPerformance": "Performa Pesanan Draft",
+      "staffPerformance": "Performa Staf",
+      "operationalKPIs": "KPI Operasional",
+      "hourlyActivityDistribution": "Distribusi Aktivitas Per Jam",
+      "sessionsRevenueAndFnbByHour": "Sesi, Pendapatan, dan Pesanan F&B per Jam",
+      "customerOverview": "Ringkasan Pelanggan",
+      "visitFrequencyDistribution": "Distribusi Frekuensi Kunjungan"
+    },
+    "labels": {
+      "sold": "terjual",
+      "avgValue": "Rata-rata Nilai",
+      "totalDrafts": "Total Draft",
+      "assigned": "Ditugaskan",
+      "conversionRate": "Tingkat Konversi",
+      "avgWaitTime": "Rata-rata Waktu Tunggu",
+      "staffMember": "Anggota Staf",
+      "role": "Peran",
+      "revenue": "Pendapatan",
+      "rating": "Rating",
+      "tableUtilization": "Utilisasi Meja",
+      "inventoryAlerts": "Peringatan Inventaris",
+      "peakHours": "Jam Sibuk",
+      "totalCustomers": "Total Pelanggan",
+      "returningCustomers": "Pelanggan Kembali",
+      "retention": "retensi",
+      "avgSpendPerCustomer": "Rata-rata Pengeluaran per Pelanggan",
+      "min": "mnt",
+      "hour": "Jam"
+    },
+    "tooltip": {
+      "tableRevenue": "Pendapatan Meja",
+      "fnbRevenue": "Pendapatan F&B",
+      "totalRevenue": "Total Pendapatan",
+      "sessions": "Sesi",
+      "fnbOrders": "Pesanan F&B"
+    }
+  },
+  "Stock": {
+    "title": "Laporan Stok",
+    "subtitle": "Manajemen inventaris komprehensif dan analisis stok",
+    "breadcrumbHome": "Beranda",
+    "breadcrumbStock": "Laporan Stok",
+    "refresh": "Muat Ulang",
+    "timeRanges": {
+      "last7Days": "7 hari terakhir",
+      "last14Days": "14 hari terakhir",
+      "last30Days": "30 hari terakhir",
+      "last90Days": "90 hari terakhir"
+    },
+    "cards": {
+      "totalItems": "Total Item",
+      "stockValue": "Nilai Stok",
+      "lowStockItems": "Item Stok Rendah",
+      "outOfStock": "Stok Habis",
+      "categories": "kategori",
+      "totalInventoryValue": "Total nilai inventaris",
+      "needAttention": "Perlu perhatian",
+      "urgentReorder": "Perlu segera dipesan ulang"
+    },
+    "sections": {
+      "stockAlerts": "Peringatan Stok",
+      "categoryOverview": "Ringkasan Kategori",
+      "currentStockLevels": "Level Stok Saat Ini",
+      "stockMovement": "Pergerakan Stok ({days} hari terakhir)"
+    },
+    "table": {
+      "itemName": "Nama Item",
+      "category": "Kategori",
+      "currentStock": "Stok Saat Ini",
+      "minLevel": "Level Minimum",
+      "status": "Status",
+      "unit": "Satuan",
+      "stockValue": "Nilai Stok",
+      "totalSold": "Total Terjual",
+      "revenue": "Pendapatan",
+      "dailyAvg": "Rata-rata Harian",
+      "orders": "Pesanan",
+      "lastOrder": "Pesanan Terakhir"
+    },
+    "status": {
+      "outOfStock": "Stok Habis",
+      "lowStock": "Stok Rendah",
+      "mediumStock": "Stok Sedang",
+      "highStock": "Stok Tinggi",
+      "unknown": "Tidak Diketahui",
+      "normal": "Normal",
+      "high": "Tinggi",
+      "medium": "Sedang",
+      "low": "Rendah"
+    },
+    "labels": {
+      "items": "item",
+      "reorder": "Pesan Ulang",
+      "totalValue": "Total Nilai",
+      "na": "T/A"
+    }
+  },
+  "Users": {
+    "title": "Manajemen Staf",
+    "subtitle": "Kelola anggota tim dan peran mereka",
+    "addStaffMember": "Tambah Anggota Staf",
+    "editStaffMember": "Edit Anggota Staf",
+    "updateStaffMember": "Perbarui Anggota Staf",
+    "addNewStaffMember": "Tambah Anggota Staf Baru",
+    "confirmDeactivation": "Konfirmasi Nonaktifkan",
+    "filters": {
+      "allStaff": "Semua Staf",
+      "activeOnly": "Hanya Aktif",
+      "inactiveOnly": "Hanya Tidak Aktif"
+    },
+    "table": {
+      "name": "Nama",
+      "role": "Peran",
+      "status": "Status",
+      "created": "Dibuat",
+      "actions": "Aksi"
+    },
+    "status": {
+      "active": "Aktif",
+      "inactive": "Tidak Aktif"
+    },
+    "actions": {
+      "edit": "Edit",
+      "activate": "Aktifkan",
+      "deactivate": "Nonaktifkan",
+      "delete": "Hapus"
+    },
+    "roles": {
+      "staff": "Staf",
+      "manager": "Manajer",
+      "admin": "Admin",
+      "cashier": "Kasir",
+      "waiter": "Pelayan",
+      "chef": "Koki",
+      "supervisor": "Supervisor"
+    },
+    "form": {
+      "fullName": "Nama Lengkap",
+      "enterFullName": "Masukkan nama lengkap",
+      "role": "Peran",
+      "cancel": "Batal"
+    },
+    "messages": {
+      "totalStaffMembers": "Total: {count} anggota staf",
+      "noStaffMembersFound": "Tidak ada anggota staf ditemukan",
+      "deactivateConfirmation": "Apakah Anda yakin ingin menonaktifkan {name}?",
+      "deactivateDescription": "Ini akan membuat mereka tidak tersedia untuk tugas baru tetapi menyimpan data historis.",
+      "yesDeactivate": "Ya, nonaktifkan"
+    }
+  },
+  "Modals": {
+    "tableModal": {
+      "createTitle": "Buat Meja Baru",
+      "tableName": "Nama Meja",
+      "tableNamePlaceholder": "e.g. Meja 1",
+      "billingType": "Jenis Penagihan",
+      "hourlyBilling": "Penagihan Per Jam",
+      "perMinuteBilling": "Penagihan Per Menit",
+      "hourlyRate": "Tarif Per Jam (IDR)",
+      "hourlyRatePlaceholder": "e.g. 100000",
+      "hourlyRateHelper": "Durasi sesi akan dibulatkan ke jam penuh",
+      "perMinuteRate": "Tarif Per Menit (IDR)",
+      "perMinuteRatePlaceholder": "e.g. 1500",
+      "perMinuteRateHelper": "Durasi sesi dibulatkan setelah 30 detik",
+      "status": "Status",
+      "statusPlaceholder": "Pilih status",
+      "cancelButton": "Batal",
+      "createButton": "Buat Meja",
+      "updateButton": "Perbarui Meja",
+      "deleteButton": "Hapus",
+      "editTitle": "Ubah Meja"
+    },
+    "editTitle": "Ubah Meja",
+    "deleteTitle": "Hapus Meja",
+    "deleteConfirmation": "Apakah Anda yakin ingin menghapus <strong>{tableName}</strong>? Tindakan ini tidak dapat diurungkan.",
+    "startSessionTitle": "Mulai Sesi - {tableName}",
+    "billingTitle": "Ringkasan Tagihan Sesi",
+    "fnbTitle": "Pesanan F&B - {tableName}",
+    "customerLabel": "Nama Pelanggan",
+    "hourlyRateLabel": "Tarif Per Jam (IDR)",
+    "statusLabel": "Status",
+    "plannedDurationLabel": "Durasi Terencana (menit)",
+    "cancelButton": "Batal",
+    "createButton": "Buat Meja",
+    "updateButton": "Perbarui Meja",
+    "deleteButton": "Hapus"
+  },
+  "Navigation": {
+    "dashboard": "Dasbor",
+    "analytics": "Analitik",
+    "tables": "Meja",
+    "f&b": "F&B",
+    "menumanagement": "Manajemen Menu",
+    "possystem": "Sistem POS",
+    "pos": "POS",
+    "revenue": "Pendapatan",
+    "stockreport": "Laporan Stok",
+    "transactions": "Transaksi",
+    "usermanagement": "Manajemen Pengguna",
+    "adminsettings": "Pengaturan Admin",
+    "pricingpackages": "Paket Harga",
+    "pricingPackages": "Paket Harga"
+  },
+  "Common": {
+    "save": "Simpan",
+    "cancel": "Batal",
+    "edit": "Ubah",
+    "delete": "Hapus",
+    "create": "Buat",
+    "update": "Perbarui",
+    "loading": "Memuat...",
+    "error": "Error",
+    "success": "Berhasil",
+    "warning": "Peringatan",
+    "info": "Info",
+    "active": "Aktif",
+    "inactive": "Tidak Aktif",
+    "yes": "Ya",
+    "no": "Tidak",
+    "confirm": "Konfirmasi",
+    "close": "Tutup",
+    "view": "Lihat",
+    "actions": "Aksi",
+    "status": "Status",
+    "name": "Nama",
+    "description": "Deskripsi",
+    "price": "Harga",
+    "quantity": "Jumlah",
+    "total": "Total",
+    "date": "Tanggal",
+    "time": "Waktu",
+    "staff": "Staf",
+    "order": "Pesanan",
+    "payment": "Pembayaran",
+    "transaction": "Transaksi",
+    "items": "item",
+    "clear": "Kosongkan",
+    "menuItems": "Item Menu",
+    "currentOrders": "Pesanan Saat Ini",
+    "newOrder": "Pesanan Baru",
+    "cartIsEmpty": "Keranjang kosong",
+    "staffMember": "Anggota Staf",
+    "selectStaff": "Pilih Staf",
+    "duration": "Durasi",
+    "move": "Pindah",
+    "durationManagement": "Manajemen Durasi",
+    "loadingFnBMenu": "Memuat menu F&B...",
+    "moveSessionToAnotherTable": "Pindahkan Sesi ke Meja Lain",
+    "currentSession": "Sesi Saat Ini",
+    "customer": "Pelanggan",
+    "currentTable": "Meja Saat Ini",
+    "selectTargetTable": "Pilih Meja Tujuan",
+    "loadingAvailableTables": "Memuat meja yang tersedia...",
+    "noAvailableTablesFound": "Tidak ada meja tersedia ditemukan",
+    "selectATable": "Pilih meja...",
+    "targetTable": "Meja Tujuan",
+    "table": "Meja",
+    "rate": "Tarif",
+    "available": "Tersedia",
+    "warning": "Peringatan",
+    "moveSessionWarning": "Memindahkan sesi akan mentransfer semua pesanan F&B yang tertunda ke meja baru. Penagihan akan dilanjutkan dengan durasi dan struktur tarif yang sama.",
+    "movingSession": "Memindahkan Sesi...",
+    "moveSession": "Pindahkan Sesi",
+    "failedToFetchAvailableTables": "Gagal memuat meja yang tersedia",
+    "errorFetchingTables": "Error memuat meja",
+    "failedToMoveSession": "Gagal memindahkan sesi",
+    "errorMovingSession": "Error memindahkan sesi",
+    "changeToPerMinute": "Ubah ke Per Menit",
+    "changeToHourly": "Ubah ke Per Jam",
+    "currentDuration": "Durasi Saat Ini",
+    "minutes": "menit",
+    "hours": "jam",
+    "min": "mnt",
+    "sec": "dtk",
+    "billingType": "Jenis Penagihan",
+    "hourlyRate": "Tarif Per Jam",
+    "perMinuteRate": "Tarif Per Menit",
+    "billableHours": "Jam Tagihan",
+    "durationAndBillingType": "Durasi & Jenis Penagihan",
+    "durationMinutes": "Durasi (menit)",
+    "failedToRecalculateBilling": "Gagal menghitung ulang tagihan",
+    "errorRecalculatingBilling": "Error menghitung ulang tagihan",
+    "currency": {
+      "compact": {
+        "thousand": "Rb",
+        "million": "Jt",
+        "billion": "Mly"
+      }
+    }
+  },
+  "AdminPage": {
+    "title": "Pengaturan Admin",
+    "subtitle": "Kelola konfigurasi sistem dan pengaturan penagihan",
+    "billingSystem": {
+      "title": "Sistem Penagihan Meja",
+      "subtitle": "Konfigurasikan penagihan untuk setiap meja secara individual menggunakan antarmuka manajemen meja.",
+      "perMinuteAvailable": "Penagihan Per-Menit Tersedia",
+      "features": {
+        "individualConfig": "Konfigurasi Individual: Setiap meja dapat diatur sebagai penagihan per jam atau per menit",
+        "hourlyBilling": "Penagihan Per Jam: Waktu sesi dibulatkan ke jam penuh berikutnya",
+        "perMinuteBilling": "Penagihan Per Menit: Waktu sesi ditagih per menit (dibulatkan setelah 30 detik)",
+        "easyManagement": "Manajemen Mudah: Ubah jenis penagihan saat membuat atau mengedit meja"
+      },
+      "howToTitle": "Cara Mengonfigurasi Meja:",
+      "steps": {
+        "step1": "Buka Meja → Buat Meja Baru atau Edit meja yang ada",
+        "step2": "Pilih Jenis Penagihan: \"Penagihan Per Jam\" atau \"Penagihan Per Menit\"",
+        "step3": "Masukkan tarif untuk jenis penagihan yang dipilih",
+        "step4": "Setiap meja akan menagih sesuai dengan konfigurasi individualnya"
+      }
+    },
+    "systemInfo": {
+      "title": "Informasi Sistem:",
+      "version": "Versi:",
+      "perMinuteBilling": "Penagihan per-menit:",
+      "individualTableConfig": "Konfigurasi meja individual:",
+      "apiEndpoints": "API Endpoints:",
+      "active": "Aktif",
+      "enabled": "Diaktifkan"
+    },
+    "taxSettings": {
+      "title": "Pengaturan Pajak (PPN)",
+      "subtitle": "Konfigurasi pengaturan pajak untuk sesi meja dan pesanan F&B",
+      "enableTax": "Aktifkan Pemungutan Pajak",
+      "taxPercentage": "Persentase Pajak (%)",
+      "taxName": "Nama/Label Pajak",
+      "applyTaxTo": "Terapkan Pajak Pada:",
+      "tableSessions": "Sesi Meja",
+      "fnbOrders": "Pesanan Makanan & Minuman",
+      "note": "Catatan:",
+      "noteText": "Tarif pajak saat ini di Indonesia adalah 11% (PPN). Perubahan akan berlaku untuk pesanan dan sesi baru saja.",
+      "saving": "Menyimpan...",
+      "saveTaxSettings": "Simpan Pengaturan Pajak"
+    }
+  },
+  "PricingPackages": {
+    "title": "Manajemen Paket",
+    "subtitle": "Kelola paket harga meja Anda",
+    "addPackage": "Tambah Paket",
+    "categories": {
+      "all": "Semua Paket",
+      "hourly": "Paket Jam",
+      "per_minute": "Paket Menit"
+    },
+    "table": {
+      "name": "Nama Paket",
+      "category": "Kategori",
+      "rate": "Tarif",
+      "status": "Status",
+      "default": "Default",
+      "actions": "Aksi"
+    },
+    "form": {
+      "addTitle": "Tambah Paket Baru",
+      "editTitle": "Edit Paket",
+      "name": "Nama Paket",
+      "namePlaceholder": "contoh: MALAM, WEEKEND, VIP",
+      "description": "Deskripsi",
+      "descriptionPlaceholder": "Deskripsi opsional untuk paket ini",
+      "category": "Kategori",
+      "selectCategory": "Pilih kategori",
+      "hourlyRate": "Tarif per Jam",
+      "perMinuteRate": "Tarif per Menit",
+      "isDefault": "Jadikan default untuk kategori ini",
+      "isActive": "Aktif",
+      "sortOrder": "Urutan",
+      "create": "Buat Paket",
+      "update": "Perbarui Paket",
+      "cancel": "Batal",
+      "saving": "Menyimpan..."
+    },
+    "status": {
+      "active": "Aktif",
+      "inactive": "Tidak Aktif"
+    },
+    "messages": {
+      "createSuccess": "Paket berhasil dibuat",
+      "updateSuccess": "Paket berhasil diperbarui",
+      "deleteSuccess": "Paket berhasil dihapus",
+      "deleteError": "Tidak dapat menghapus paket yang sedang digunakan",
+      "loadError": "Gagal memuat paket",
+      "saveError": "Gagal menyimpan paket",
+      "confirmDelete": "Apakah Anda yakin ingin menghapus paket ini?"
+    }
+  }
+}

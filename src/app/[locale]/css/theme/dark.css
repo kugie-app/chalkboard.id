@@ -1,0 +1,85 @@
+.dark .sidebar-nav .caption {
+    border-top: 1px solid var(--color-darkborder);
+}
+
+.dark:root {
+    --color-surface-ld: #1A2537;
+}
+
+.dark .timeline-tabs .timeline .timeline-icon:after {
+    background-color: var(--color-darkborder);
+}
+
+.dark .timeline-tabs .timeline-list {
+    border-bottom: 1px solid var(--color-darkborder);
+}
+
+.dark #vector-map svg .dxm-background {
+    fill: transparent !important;
+}
+
+.dark #vector-map svg path {
+    stroke-width: 0;
+}
+
+.dark .rbc-today {
+    background-color: var(--color-darkmuted) !important;
+}
+
+.dark .rbc-toolbar button:hover {
+    color: var(--color-white) !important;
+}
+
+.dark .rbc-header {
+    color: var(--color-white);
+}
+
+.dark .rbc-month-row+.rbc-month-row,
+.dark .rbc-day-bg+.rbc-day-bg,
+.dark .rbc-header,
+.dark .rbc-month-view,
+.dark .rbc-toolbar button,
+.dark .rbc-time-view,
+.dark .rbc-timeslot-group,
+.dark .rbc-day-slot .rbc-time-slot,
+.dark .rbc-time-content,
+.dark .rbc-time-header-content,
+.dark .rbc-agenda-view table.rbc-agenda-table,
+.dark .rbc-agenda-view table.rbc-agenda-table tbody > tr + tr,
+.dark .rbc-agenda-view table.rbc-agenda-table tbody > tr > td + td,
+.dark .rbc-time-content>*+*>* {
+    border-color: var(--color-darkborder) !important;
+}
+
+.dark .rbc-day-bg+.rbc-day-bg {
+    border-left: 1px solid var(--color-darkborder) !important;
+}
+
+.dark .rbc-toolbar button {
+    background-color: var(--color-darkmuted) !important;
+    color: var(--color-white);
+}
+
+
+.dark .rbc-toolbar button:active,
+.dark .rbc-toolbar button.rbc-active {
+    background-color: var(--color-lightprimary) !important;
+}
+
+.dark .ql-toolbar.ql-snow {
+    border: 1px solid var(--color-darkborder) !important;
+}
+
+.dark .ql-container.ql-snow {
+    border: 1px solid var(--color-darkborder) !important;
+}
+
+.dark .code-modal pre {
+    background-color: var(--color-darkmuted) !important;
+    color: inherit !important;
+}
+
+/* For input Date */
+.dark ::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}

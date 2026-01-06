@@ -15,14 +15,8 @@ One-click deploy to Railway with automatic PostgreSQL database:
 Run with Docker using our official images:
 
 ```bash
-# Quick start (general purpose)
+# Quick start
 docker run -p 3000:3000 kugieapp/chalkboard:latest
-
-# Edge runtime (for serverless environments)
-docker run -p 3000:3000 kugieapp/chalkboard:edge
-
-# Node.js optimized (for traditional hosting)
-docker run -p 3000:3000 kugieapp/chalkboard:node
 
 # Or use Docker Compose
 docker compose up
@@ -301,13 +295,7 @@ The application uses a modern component architecture:
 docker compose -f docker-compose.local.yml up
 
 # Production deployment
-docker compose up chalkboard
-
-# Edge runtime (for serverless environments)
-docker compose up chalkboard-edge
-
-# Node.js runtime (for traditional hosting)
-docker compose up chalkboard-node
+docker compose up
 ```
 
 ## 📄 License

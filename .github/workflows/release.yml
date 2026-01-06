@@ -80,9 +80,6 @@ jobs:
   build-docker:
     needs: test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        variant: [latest, edge, node]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -105,31 +102,8 @@ jobs:
             type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=${{ matrix.variant }},enable={{is_default_branch}}
+            type=raw,value=latest
 
-      - name: Set deployment mode
-        id: deployment
-        run: |
-          case "${{ matrix.variant }}" in
-            edge)
-              echo "mode=edge" >> $GITHUB_OUTPUT
-              echo "serverless=true" >> $GITHUB_OUTPUT
-              echo "pooling=false" >> $GITHUB_OUTPUT
-              echo "runtime=edge" >> $GITHUB_OUTPUT
-              ;;
-            node)
-              echo "mode=node" >> $GITHUB_OUTPUT
-              echo "serverless=false" >> $GITHUB_OUTPUT
-              echo "pooling=true" >> $GITHUB_OUTPUT
-              echo "runtime=" >> $GITHUB_OUTPUT
-              ;;
-            *)
-              echo "mode=auto" >> $GITHUB_OUTPUT
-              echo "serverless=false" >> $GITHUB_OUTPUT
-              echo "pooling=true" >> $GITHUB_OUTPUT
-              echo "runtime=" >> $GITHUB_OUTPUT
-              ;;
-          esac
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -137,9 +111,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:${{ github.ref_name }}-${{ matrix.variant }}
-            ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             DATABASE_URL=postgresql://user:password@localhost:5432/chalkboard_build
@@ -147,10 +119,9 @@ jobs:
             NEXTAUTH_URL=http://localhost:3000
             DEFAULT_EMAIL=admin@example.com
             DEFAULT_PASSWORD=admin123
-            DEPLOYMENT_MODE=${{ steps.deployment.outputs.mode }}
-            USE_SERVERLESS_DB=${{ steps.deployment.outputs.serverless }}
-            DB_POOLING=${{ steps.deployment.outputs.pooling }}
-            NEXT_RUNTIME=${{ steps.deployment.outputs.runtime }}
+            DEPLOYMENT_MODE=auto
+            USE_SERVERLESS_DB=false
+            DB_POOLING=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -173,10 +144,9 @@ jobs:
           echo "## What's Changed" > CHANGELOG.md
           git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD~1)..HEAD >> CHANGELOG.md || echo "- Initial release" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
-          echo "## Docker Images" >> CHANGELOG.md
+          echo "## Docker Image" >> CHANGELOG.md
           echo "- \`docker pull kugieapp/chalkboard:${{ github.ref_name }}\`" >> CHANGELOG.md
-          echo "- \`docker pull kugieapp/chalkboard:${{ github.ref_name }}-edge\`" >> CHANGELOG.md
-          echo "- \`docker pull kugieapp/chalkboard:${{ github.ref_name }}-node\`" >> CHANGELOG.md
+          echo "- \`docker pull kugieapp/chalkboard:latest\`" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "## Windows Standalone" >> CHANGELOG.md
           echo "Download and extract the Windows release archive, then run \`install.bat\` as Administrator." >> CHANGELOG.md

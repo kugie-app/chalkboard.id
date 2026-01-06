@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: chalkboard-test-db
+    environment:
+      POSTGRES_DB: chalkboard_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d chalkboard_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  test_postgres_data:

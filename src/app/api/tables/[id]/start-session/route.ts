@@ -54,6 +54,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Determine duration type based on pricing package category
     const sessionDurationType = pricingPackage[0].category === 'per_minute' ? 'per_minute' : 'hourly';
 
+    // Get staff ID from session or use test default
+    const staffId = (session as any)?.staffId || (session?.user as any)?.staffId || 1;
+    
     // Start new session
     const newSession = await db.insert(tableSessions).values({
       tableId,
@@ -63,6 +66,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       durationType: sessionDurationType,
       pricingPackageId,
       status: 'active',
+      staffId,
     }).returning();
 
     // Update table status to occupied

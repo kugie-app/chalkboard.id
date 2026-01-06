@@ -18,16 +18,20 @@ export async function GET(request: NextRequest) {
     const days = parseInt(searchParams.get('days') || '30');
     const period = searchParams.get('period') || 'daily'; // daily, weekly, monthly
 
+    // Use consistent date handling - create dates properly for range
     const endDate = date ? new Date(date) : new Date();
+    endDate.setHours(23, 59, 59, 999); // End of day
+    
     const startDate = new Date(endDate);
     startDate.setDate(startDate.getDate() - days);
+    startDate.setHours(0, 0, 0, 0); // Start of day
 
     // We'll calculate the summary from daily data to ensure consistency
 
     // Get daily revenue trend - query table sessions
     const dailyTableRevenue = await db.select({
       date: sql<string>`DATE(${tableSessions.createdAt})`,
-      tableRevenue: sql<number>`COALESCE(SUM(${tableSessions.totalCost}), 0)`,
+      tableRevenue: sql<number>`COALESCE(SUM(CAST(${tableSessions.totalCost} AS NUMERIC)), 0)`,
       sessions: sql<number>`COUNT(${tableSessions.id})`,
     })
       .from(tableSessions)
@@ -43,7 +47,7 @@ export async function GET(request: NextRequest) {
     // Get daily F&B revenue
     const dailyFnbRevenue = await db.select({
       date: sql<string>`DATE(${fnbOrders.createdAt})`,
-      fnbRevenue: sql<number>`COALESCE(SUM(${fnbOrders.total}), 0)`,
+      fnbRevenue: sql<number>`COALESCE(SUM(CAST(${fnbOrders.total} AS NUMERIC)), 0)`,
       orders: sql<number>`COUNT(${fnbOrders.id})`,
     })
       .from(fnbOrders)
@@ -67,9 +71,12 @@ export async function GET(request: NextRequest) {
     }[] = [];
     
     if (period === 'daily') {
-      // Generate daily data for all days in range
-      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split('T')[0];
+      // Generate daily data for exact number of days (days + 1 for inclusive range)
+      for (let i = 0; i <= days; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        const dateStr = currentDate.toISOString().split('T')[0];
+        
         const tableData = dailyTableRevenue.find(item => item.date === dateStr);
         const fnbData = dailyFnbRevenue.find(item => item.date === dateStr);
         
@@ -81,8 +88,8 @@ export async function GET(request: NextRequest) {
           tableRevenue,
           fnbRevenue,
           totalRevenue: tableRevenue + fnbRevenue,
-          sessions: tableData?.sessions || 0,
-          orders: fnbData?.orders || 0,
+          sessions: Number(tableData?.sessions || 0),
+          orders: Number(fnbData?.orders || 0),
         });
       }
     } else if (period === 'weekly') {
@@ -184,9 +191,9 @@ export async function GET(request: NextRequest) {
     const tableRevenue = await db.select({
       tableId: tables.id,
       tableName: tables.name,
-      totalRevenue: sql<number>`COALESCE(SUM(${tableSessions.totalCost}), 0)`,
+      totalRevenue: sql<number>`COALESCE(SUM(CAST(${tableSessions.totalCost} AS NUMERIC)), 0)`,
       totalSessions: sql<number>`COUNT(${tableSessions.id})`,
-      avgRevenuePerSession: sql<number>`COALESCE(AVG(${tableSessions.totalCost}), 0)`,
+      avgRevenuePerSession: sql<number>`COALESCE(AVG(CAST(${tableSessions.totalCost} AS NUMERIC)), 0)`,
       totalHours: sql<number>`COALESCE(SUM(${tableSessions.actualDuration}), 0) / 60.0`,
       hourlyRate: tables.hourlyRate,
     })
@@ -200,12 +207,12 @@ export async function GET(request: NextRequest) {
       )
       .where(eq(tables.isActive, true))
       .groupBy(tables.id, tables.name, tables.hourlyRate)
-      .orderBy(sql`COALESCE(SUM(${tableSessions.totalCost}), 0) DESC`);
+      .orderBy(sql`COALESCE(SUM(CAST(${tableSessions.totalCost} AS NUMERIC)), 0) DESC`);
 
     // Get payment method breakdown
     const paymentMethodBreakdown = await db.select({
       paymentMethod: sql<string>`COALESCE(${payments.paymentMethod}, 'Unknown')`,
-      totalAmount: sql<number>`COALESCE(SUM(${payments.amount}), 0)`,
+      totalAmount: sql<number>`COALESCE(SUM(CAST(${payments.amount} AS NUMERIC)), 0)`,
       transactionCount: sql<number>`COUNT(${payments.id})`,
       successRate: sql<number>`
         CASE 
@@ -223,15 +230,15 @@ export async function GET(request: NextRequest) {
         )
       )
       .groupBy(payments.paymentMethod)
-      .orderBy(sql`COALESCE(SUM(${payments.amount}), 0) DESC`);
+      .orderBy(sql`COALESCE(SUM(CAST(${payments.amount} AS NUMERIC)), 0) DESC`);
 
     // Get top selling F&B items
     const topSellingItems = await db.select({
       itemId: fnbItems.id,
       itemName: fnbItems.name,
       totalQuantity: sql<number>`SUM(${fnbOrderItems.quantity})`,
-      totalRevenue: sql<number>`SUM(${fnbOrderItems.subtotal})`,
-      avgPrice: sql<number>`AVG(${fnbOrderItems.unitPrice})`,
+      totalRevenue: sql<number>`SUM(CAST(${fnbOrderItems.subtotal} AS NUMERIC))`,
+      avgPrice: sql<number>`AVG(CAST(${fnbOrderItems.unitPrice} AS NUMERIC))`,
       orderCount: sql<number>`COUNT(DISTINCT ${fnbOrderItems.orderId})`,
     })
       .from(fnbOrderItems)
@@ -244,18 +251,15 @@ export async function GET(request: NextRequest) {
         )
       )
       .groupBy(fnbItems.id, fnbItems.name)
-      .orderBy(sql`SUM(${fnbOrderItems.subtotal}) DESC`)
+      .orderBy(sql`SUM(CAST(${fnbOrderItems.subtotal} AS NUMERIC)) DESC`)
       .limit(10);
 
-    // Get hourly revenue distribution
-    const hourlyRevenue = await db.select({
+    // Get hourly table revenue distribution
+    const hourlyTableRevenue = await db.select({
       hour: sql<number>`EXTRACT(HOUR FROM ${tableSessions.startTime})`,
-      tableRevenue: sql<number>`COALESCE(SUM(${tableSessions.totalCost}), 0)`,
-      fnbRevenue: sql<number>`COALESCE(SUM(${fnbOrders.total}), 0)`,
-      totalRevenue: sql<number>`COALESCE(SUM(${tableSessions.totalCost}), 0) + COALESCE(SUM(${fnbOrders.total}), 0)`,
+      tableRevenue: sql<number>`COALESCE(SUM(CAST(${tableSessions.totalCost} AS NUMERIC)), 0)`,
     })
       .from(tableSessions)
-      .fullJoin(fnbOrders, sql`EXTRACT(HOUR FROM ${tableSessions.startTime}) = EXTRACT(HOUR FROM ${fnbOrders.createdAt})`)
       .where(
         and(
           gte(tableSessions.createdAt, startDate),
@@ -265,14 +269,33 @@ export async function GET(request: NextRequest) {
       .groupBy(sql`EXTRACT(HOUR FROM ${tableSessions.startTime})`)
       .orderBy(sql`EXTRACT(HOUR FROM ${tableSessions.startTime})`);
 
+    // Get hourly F&B revenue distribution
+    const hourlyFnbRevenue = await db.select({
+      hour: sql<number>`EXTRACT(HOUR FROM ${fnbOrders.createdAt})`,
+      fnbRevenue: sql<number>`COALESCE(SUM(CAST(${fnbOrders.total} AS NUMERIC)), 0)`,
+    })
+      .from(fnbOrders)
+      .where(
+        and(
+          gte(fnbOrders.createdAt, startDate),
+          lte(fnbOrders.createdAt, endDate)
+        )
+      )
+      .groupBy(sql`EXTRACT(HOUR FROM ${fnbOrders.createdAt})`)
+      .orderBy(sql`EXTRACT(HOUR FROM ${fnbOrders.createdAt})`);
+
     // Create complete hourly revenue data
     const completeHourlyRevenue = Array.from({ length: 24 }, (_, hour) => {
-      const data = hourlyRevenue.find(h => h.hour === hour);
+      const tableData = hourlyTableRevenue.find(h => h.hour === hour);
+      const fnbData = hourlyFnbRevenue.find(h => h.hour === hour);
+      const tableRevenue = Number(tableData?.tableRevenue || 0);
+      const fnbRevenue = Number(fnbData?.fnbRevenue || 0);
+      
       return {
         hour,
-        tableRevenue: data?.tableRevenue || 0,
-        fnbRevenue: data?.fnbRevenue || 0,
-        totalRevenue: data?.totalRevenue || 0,
+        tableRevenue,
+        fnbRevenue,
+        totalRevenue: tableRevenue + fnbRevenue,
       };
     });
 
@@ -280,13 +303,31 @@ export async function GET(request: NextRequest) {
       period: {
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
-        days
+        days: Number(days)
       },
       summary,
       dailyRevenue: dailyRevenue,
-      tableRevenue: tableRevenue || [],
-      paymentMethods: paymentMethodBreakdown || [],
-      topSellingItems: topSellingItems || [],
+      tableRevenue: (tableRevenue || []).map(table => ({
+        ...table,
+        totalRevenue: Number(table.totalRevenue || 0),
+        totalSessions: Number(table.totalSessions || 0),
+        avgRevenuePerSession: Number(table.avgRevenuePerSession || 0),
+        totalHours: Number(table.totalHours || 0),
+        hourlyRate: Number(table.hourlyRate || 0),
+      })),
+      paymentMethods: (paymentMethodBreakdown || []).map(method => ({
+        ...method,
+        totalAmount: Number(method.totalAmount || 0),
+        transactionCount: Number(method.transactionCount || 0),
+        successRate: Number(method.successRate || 0),
+      })),
+      topSellingItems: (topSellingItems || []).map(item => ({
+        ...item,
+        totalQuantity: Number(item.totalQuantity || 0),
+        totalRevenue: Number(item.totalRevenue || 0),
+        avgPrice: Number(item.avgPrice || 0),
+        orderCount: Number(item.orderCount || 0),
+      })),
       hourlyRevenue: completeHourlyRevenue,
     });
   } catch (error) {

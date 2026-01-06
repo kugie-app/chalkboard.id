@@ -142,6 +142,11 @@ jobs:
             ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
+            DATABASE_URL=postgresql://user:password@localhost:5432/chalkboard_build
+            NEXTAUTH_SECRET=build-time-secret-key-for-github-actions-only
+            NEXTAUTH_URL=http://localhost:3000
+            DEFAULT_EMAIL=admin@example.com
+            DEFAULT_PASSWORD=admin123
             DEPLOYMENT_MODE=${{ steps.deployment.outputs.mode }}
             USE_SERVERLESS_DB=${{ steps.deployment.outputs.serverless }}
             DB_POOLING=${{ steps.deployment.outputs.pooling }}

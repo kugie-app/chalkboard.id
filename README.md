@@ -10,6 +10,20 @@ One-click deploy to Railway with automatic PostgreSQL database:
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/chalkboard-id)
 
+### Docker (Recommended for Self-Hosting)
+
+Run with Docker using our official images:
+
+```bash
+# Quick start
+docker run -p 3000:3000 kugieapp/chalkboard:latest
+
+# Or use Docker Compose
+docker compose up
+```
+
+[🐳 View on Docker Hub](https://hub.docker.com/r/kugieapp/chalkboard)
+
 ### Windows Standalone (Recommended for Local)
 
 Self-contained Windows executable with auto-update support:
@@ -19,7 +33,7 @@ Self-contained Windows executable with auto-update support:
 3. Configure PostgreSQL connection
 4. Launch from desktop shortcut
 
-[📥 Download Windows Release](https://github.com/your-username/chalkboard/releases)
+[📥 Download Windows Release](https://github.com/kugieapp/chalkboard/releases)
 
 ## 🎯 Overview
 
@@ -29,10 +43,10 @@ This modern web application offers a complete solution for billiard hall operato
 
 | Deployment Mode | Use Case | Database | Auto-Update | Best For |
 |----------------|----------|----------|-------------|----------|
+| **Docker** | Container deployment | Any PostgreSQL | ❌ | VPS, dedicated servers, self-hosted |
 | **Railway** | Cloud hosting | Railway PostgreSQL | ❌ | Open source, cloud deployment |
 | **Windows Standalone** | Local installation | Local PostgreSQL | ✅ | Self-hosted, multiple versions |
 | **Vercel Edge** | Serverless | Neon PostgreSQL | ❌ | High-performance, global |
-| **Docker** | Container deployment | Any PostgreSQL | ❌ | VPS, dedicated servers |
 
 ## ✨ Key Features
 
@@ -274,9 +288,25 @@ The application uses a modern component architecture:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## 🚀 Quick Start with Docker
+
+```bash
+# Development with hot reload
+docker compose -f docker-compose.local.yml up
+
+# Production deployment
+docker compose up chalkboard
+
+# Edge runtime (for serverless environments)
+docker compose up chalkboard-edge
+
+# Node.js runtime (for traditional hosting)
+docker compose up chalkboard-node
+```
+
 ## 📄 License
 
-This project is proprietary software developed for Chalkboard.id.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🆘 Support
 

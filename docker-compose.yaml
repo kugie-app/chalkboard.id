@@ -18,7 +18,7 @@ services:
         - DB_POOLING=${DB_POOLING:-true}
     ports:
       - "3000:3000"
-    image: geraldkugie/chalkboard:latest
+    image: kugieapp/chalkboard:latest
     environment:
       - DATABASE_URL=${DATABASE_URL:-postgresql://username:password@host:5432/database}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-nextauth-secret}
@@ -42,7 +42,7 @@ services:
         - USE_SERVERLESS_DB=true
         - DB_POOLING=false
         - NEXT_RUNTIME=edge
-    image: geraldkugie/chalkboard:edge
+    image: kugieapp/chalkboard:edge
     environment:
       - DEPLOYMENT_MODE=edge
       - USE_SERVERLESS_DB=true
@@ -59,7 +59,7 @@ services:
         - DEPLOYMENT_MODE=node
         - USE_SERVERLESS_DB=false
         - DB_POOLING=true
-    image: geraldkugie/chalkboard:node
+    image: kugieapp/chalkboard:node
     environment:
       - DEPLOYMENT_MODE=node
       - USE_SERVERLESS_DB=false

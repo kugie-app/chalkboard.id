@@ -12,7 +12,7 @@ const { execSync } = require('child_process');
 // Configuration
 const config = {
   appName: 'Chalkboard.id',
-  version: process.env.npm_package_version || '4.0.0',
+  version: require('../package.json').version,
   buildDir: path.join(__dirname, '..', '.next', 'standalone'),
   outputDir: path.join(__dirname, '..', 'dist'),
   assetsDir: path.join(__dirname, '..', '.next', 'static'),

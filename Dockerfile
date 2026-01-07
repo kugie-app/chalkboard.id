@@ -93,6 +93,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Change ownership of entrypoint script to nextjs user (before USER directive)
+RUN chown nextjs:nodejs /app/docker-entrypoint.sh
 
 USER nextjs
 
@@ -103,8 +105,5 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-
-# Change ownership of entrypoint script to nextjs user
-RUN chown nextjs:nodejs /app/docker-entrypoint.sh
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

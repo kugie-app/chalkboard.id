@@ -1,9 +1,7 @@
 [build]
-builder = "nixpacks"
-buildCommand = "bun install && bun run build:railway"
+builder = "dockerfile"
 
 [deploy]
-startCommand = "bun run db:push --force && node server.js"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"

@@ -77,6 +77,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/bun.lock* ./
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
 
+# Copy entrypoint script
+COPY --chown=nextjs:nodejs docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Copy source files needed for migrations (with proper ownership)
 COPY --from=builder --chown=nextjs:nodejs /app/src ./src
 # Copy node_modules to run bun scripts
@@ -122,4 +126,4 @@ ENV PORT=3000
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["/app/startup.sh"]
+CMD ["/usr/local/bin/docker-entrypoint.sh"]

@@ -1,9 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "bun install && bun run db:push && bun run build:railway"
+buildCommand = "bun install && bun run build:railway"
 
 [deploy]
-startCommand = "node server.js"
+startCommand = "bun run db:push && node server.js"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"

@@ -1,20 +1,38 @@
 services:
   postgres:
     image: postgres:15
-    container_name: chalkboard-test-db
     environment:
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_USER: testuser
       POSTGRES_DB: chalkboard_test
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
-      - test_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d chalkboard_test"]
+      test: ["CMD-SHELL", "pg_isready -U testuser"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  app:
+    build:
+      context: .
+      args:
+        - DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+        - NEXTAUTH_SECRET=test-secret-key
+        - NEXTAUTH_URL=http://localhost:3000
+        - DEPLOYMENT_MODE=node
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://testuser:testpass@postgres:5432/chalkboard_test
+      - NEXTAUTH_SECRET=test-secret-key
+      - NEXTAUTH_URL=http://localhost:3000
+      - DEPLOYMENT_MODE=node
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
-  test_postgres_data:
+  postgres_data:

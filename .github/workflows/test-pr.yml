@@ -53,13 +53,14 @@ jobs:
           bun run db:setup-test
 
       - name: Run tests
-        run: bun run test --passWithNoTests
+        run: bun run test:coverage --passWithNoTests
 
       - name: Upload test coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           file: ./coverage/lcov.info
           fail_ci_if_error: false
+          verbose: true
 
       - name: Lint check
         run: bun run lint || echo "Linting skipped"
@@ -90,7 +91,7 @@ jobs:
 
   build-windows:
     needs: test
-    if: always()
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: windows-latest
     env:
       DATABASE_URL: "postgresql://user:password@localhost:5432/chalkboard_build"
@@ -122,7 +123,7 @@ jobs:
 
   build-docker:
     needs: test
-    if: always()
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -174,6 +175,7 @@ jobs:
           fi
 
       - name: Check Windows build results
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           if [[ "${{ needs.build-windows.result }}" != "success" ]]; then
             echo "❌ Windows build failed"
@@ -183,6 +185,7 @@ jobs:
           fi
 
       - name: Check Docker build results
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           if [[ "${{ needs.build-docker.result }}" != "success" ]]; then
             echo "❌ Docker build failed"
@@ -193,12 +196,23 @@ jobs:
 
       - name: All checks completed
         run: |
-          echo "🎉 All builds completed!"
-          if [[ "${{ needs.test.result }}" == "success" ]]; then
-            echo "✅ Unit tests passed"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "🎉 PR checks completed!"
+            if [[ "${{ needs.test.result }}" == "success" ]]; then
+              echo "✅ Unit tests passed"
+            else
+              echo "⚠️ Unit tests failed"
+            fi
+            echo "✅ Standard build succeeded"
+            echo "ℹ️ Windows and Docker builds skipped for PR"
           else
-            echo "⚠️ Unit tests failed (but builds continued)"
+            echo "🎉 All builds completed!"
+            if [[ "${{ needs.test.result }}" == "success" ]]; then
+              echo "✅ Unit tests passed"
+            else
+              echo "⚠️ Unit tests failed (but builds continued)"
+            fi
+            echo "✅ Standard build succeeded"
+            echo "✅ Windows standalone build succeeded"  
+            echo "✅ Docker build succeeded"
           fi
-          echo "✅ Standard build succeeded"
-          echo "✅ Windows standalone build succeeded"  
-          echo "✅ Docker build succeeded"

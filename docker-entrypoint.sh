@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 echo "Starting application initialization..."
@@ -9,5 +9,5 @@ bun run db:push --force
 
 echo "Database setup complete. Starting application..."
 
-# Start the Next.js application
+# Start the application
 exec bun start

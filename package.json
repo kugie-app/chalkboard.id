@@ -31,6 +31,8 @@
     "local:full": "docker compose -f docker-compose.local.yml up -d",
     "standalone:build": "bun run build:standalone",
     "standalone:package": "bun run standalone:build && bun run package:windows",
+    "standalone:setup": "bun run db:push && echo 'Database setup complete!'",
+    "standalone:start": "node scripts/windows-startup.js",
     "standalone:dev": "DEPLOYMENT_MODE=standalone IS_STANDALONE_WINDOWS=true bun run dev",
     "package:windows": "bun run scripts/package-windows.js",
     "migration:create": "bun run scripts/create-migration.js",

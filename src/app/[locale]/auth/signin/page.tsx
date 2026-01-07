@@ -3,10 +3,10 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button, Label, TextInput, Alert } from "flowbite-react";
-import Link from "next/link";
 import CardBox from "@/components/shared/CardBox";
 import Logo from "@/components/layout/shared/logo/Logo";
 import { useTranslations } from "next-intl";
+import DatabaseStatusIndicator from "@/components/startup/DatabaseStatusIndicator";
 
 const SignIn = () => {
   const t = useTranslations("auth.signin");
@@ -50,6 +50,9 @@ const SignIn = () => {
               Billiard Hall Management System
             </p>
           </div>
+
+          {/* Database Status Indicator */}
+          <DatabaseStatusIndicator compact />
 
           {error && (
             <Alert color="failure" className="mb-4">

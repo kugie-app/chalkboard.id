@@ -8,7 +8,7 @@ A comprehensive billiard hall management system built with Next.js 15, React 19,
 
 One-click deploy to Railway with automatic PostgreSQL database:
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/chalkboard-id)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/zY4yoW?referralCode=D8ivdW&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 ### Docker (Recommended for Self-Hosting)
 
@@ -33,7 +33,7 @@ Self-contained Windows executable with auto-update support:
 3. Configure PostgreSQL connection
 4. Launch from desktop shortcut
 
-[📥 Download Windows Release](https://github.com/kugieapp/chalkboard/releases)
+[📥 Download Windows Release](https://github.com/kugie-app/chalkboard.id/releases)
 
 ## 🎯 Overview
 

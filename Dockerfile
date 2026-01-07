@@ -70,12 +70,20 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 
 # Copy package.json and bun.lock for bun scripts (migrations, seeding)
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/bun.lock* ./
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/bun.lock* ./
 
-# Copy database related files
-COPY --from=builder /app/drizzle ./drizzle
-COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+# Copy database related files (with proper ownership)
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
+
+
+# Copy source files needed for migrations (with proper ownership)
+COPY --from=builder --chown=nextjs:nodejs /app/src ./src
+# Copy node_modules to run bun scripts
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+# Copy TypeScript config for drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
@@ -91,4 +99,5 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
+
 CMD ["node", "server.js"]

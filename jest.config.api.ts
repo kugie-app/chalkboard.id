@@ -22,6 +22,10 @@ const config: Config = {
     '<rootDir>/.next/',
     '<rootDir>/dist/',
   ],
+  // Ensure tests run serially to avoid database conflicts
+  maxWorkers: 1,
+  // Set timeouts for database operations
+  testTimeout: 30000,
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',

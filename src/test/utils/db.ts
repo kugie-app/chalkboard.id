@@ -53,7 +53,7 @@ export async function cleanupDatabase() {
       RESTART IDENTITY CASCADE
     `);
   } catch (error) {
-    console.warn('⚠️ Database cleanup failed:', error.message);
+    console.warn('⚠️ Database cleanup failed, trying individual deletes:', error.message);
     // Fallback to individual deletes if truncate fails
     try {
       await db.delete(schema.fnbOrderItems).execute();

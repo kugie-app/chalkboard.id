@@ -1,10 +1,16 @@
+/**
+ * @jest-environment node
+ */
+
 import { GET, POST } from './route';
 import { testApi, expectApiSuccess, expectApiError } from '@/test/utils/api';
 import { getTestDatabase, cleanupDatabase, closeTestDatabase } from '@/test/utils/db';
 import { mockAdminSession, mockStaffSession } from '@/test/utils/auth';
 import { factories, createBulk } from '@/test/factories';
-import { fnbOrders, fnbItems, fnbCategories, staff, payments, tables as billiardTables } from '@/schema';
 import { eq } from 'drizzle-orm';
+import { staff, fnbCategories, fnbItems, fnbOrders } from '@/schema/fnb';
+import { tables as billiardTables } from '@/schema/tables';
+import { payments } from '@/schema/payments';
 
 // Mock next-auth
 jest.mock('@/lib/auth', () => ({
@@ -71,7 +77,7 @@ describe('/api/fnb/orders', () => {
     it('should return 401 when not authenticated', async () => {
       auth.mockResolvedValue(null);
       
-      const response = await testApi.get(GET, 'http://localhost:3000/api/fnb/orders', null);
+      const response = await testApi.get(GET, 'http://localhost:3000/api/fnb/orders', undefined);
       expectApiError(response, 401, 'Unauthorized');
     });
 
@@ -107,7 +113,7 @@ describe('/api/fnb/orders', () => {
       
       expectApiSuccess(response);
       expect(response.data).toHaveLength(2);
-      expect(response.data.every(order => order.status === 'pending')).toBe(true);
+      expect(response.data.every((order: any) => order.status === 'pending')).toBe(true);
     });
 
     it('should limit orders when limit parameter provided', async () => {
@@ -154,7 +160,7 @@ describe('/api/fnb/orders', () => {
         POST,
         'http://localhost:3000/api/fnb/orders',
         validOrderData,
-        null
+        undefined
       );
       
       expectApiError(response, 401, 'Unauthorized');
@@ -162,7 +168,7 @@ describe('/api/fnb/orders', () => {
 
     it('should return 400 when required fields are missing', async () => {
       const invalidData = { ...validOrderData };
-      delete invalidData.customerName;
+      delete (invalidData as any).customerName;
 
       const response = await testApi.post(
         POST,

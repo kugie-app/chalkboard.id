@@ -1,16 +1,15 @@
-import { v4 as uuidv4 } from 'uuid';
 import { 
-  tables as billiardTables, 
   pricingPackages, 
-  tableSessions, 
   fnbCategories,
   fnbItems,
   fnbOrders,
-  fnbOrderItems,
-  payments,
-  users,
   staff
 } from '@/schema';
+
+
+function generateUUID() {
+  return crypto.randomUUID();
+}
 
 // Counter for generating unique numeric IDs
 let nextId = 1;
@@ -19,7 +18,7 @@ let nextId = 1;
 export const factories = {
   // User factory
   user: (overrides = {}) => ({
-    id: uuidv4(),
+    id: generateUUID(),
     email: `user-${Date.now()}@test.com`,
     name: 'Test User',
     password: '$2a$10$K7L1OJ0/3X2iV9V9R9Hnze5lJF0GkR0MG9v2L2CJNqk9CTqgKl6Oi', // 'password123'
@@ -53,7 +52,7 @@ export const factories = {
 
   // Pricing package factory
   pricingPackage: (overrides = {}) => ({
-    id: uuidv4(), // Generate UUID for consistent ID
+    id: generateUUID(),
     name: 'Standard Package',
     description: 'Standard hourly rate',
     category: 'hourly',
@@ -173,8 +172,8 @@ export async function createBulk<T>(
 // Helper functions for creating test data with proper dependencies
 export async function createTestStaff(db: any, overrides = {}) {
   const staffData = factories.staff(overrides);
-  const [staff] = await db.insert(staff).values(staffData).returning();
-  return staff;
+  const [staffDataResult] = await db.insert(staff).values(staffData).returning();
+  return staffDataResult;
 }
 
 export async function createTestPricingPackage(db: any, overrides = {}) {

@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 import { POST } from './route';
 import { testApi, expectApiSuccess, expectApiError } from '@/test/utils/api';
 import { getTestDatabase, cleanupDatabase, closeTestDatabase } from '@/test/utils/db';

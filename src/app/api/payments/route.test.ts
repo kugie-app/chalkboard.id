@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 import { GET, POST } from './route';
 import { testApi, expectApiSuccess, expectApiError } from '@/test/utils/api';
 import { getTestDatabase, cleanupDatabase, closeTestDatabase } from '@/test/utils/db';
@@ -44,7 +48,7 @@ describe('/api/payments', () => {
     it('should return 401 when not authenticated', async () => {
       auth.mockResolvedValue(null);
       
-      const response = await testApi.get(GET, 'http://localhost:3000/api/payments', null);
+      const response = await testApi.get(GET, 'http://localhost:3000/api/payments', undefined);
       expectApiError(response, 401, 'Unauthorized');
     });
 
@@ -89,7 +93,7 @@ describe('/api/payments', () => {
       
       expectApiSuccess(response);
       expect(response.data).toHaveLength(2);
-      expect(response.data.every(payment => payment.status === 'pending')).toBe(true);
+      expect(response.data.every((payment: any) => payment.status === 'pending')).toBe(true);
     });
 
     it('should return payment by session ID', async () => {
@@ -167,7 +171,7 @@ describe('/api/payments', () => {
         POST,
         'http://localhost:3000/api/payments',
         validPaymentData,
-        null
+        undefined
       );
       
       expectApiError(response, 401, 'Unauthorized');
@@ -175,7 +179,7 @@ describe('/api/payments', () => {
 
     it('should return 400 when total amount is missing', async () => {
       const invalidData = { ...validPaymentData };
-      delete invalidData.totalAmount;
+      delete (invalidData as any).totalAmount;
 
       const response = await testApi.post(
         POST,

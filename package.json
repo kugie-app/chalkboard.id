@@ -78,6 +78,7 @@
     "@reduxjs/toolkit": "1.9.7",
     "@tabler/icons-react": "3.5.0",
     "@tanstack/react-table": "^8.20.1",
+    "@testing-library/dom": "^10.4.1",
     "@tiptap/core": "^2.10.3",
     "@tiptap/extension-code-block-lowlight": "^2.10.3",
     "@tiptap/extension-image": "^2.10.3",
@@ -130,6 +131,7 @@
     "swr": "^2.3.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
     "uuid": "^10.0.0",
     "vaul": "^1.1.2",
     "zod": "^3.24.1"

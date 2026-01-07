@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 import { GET } from './route';
 import { testApi, expectApiSuccess, expectApiError } from '@/test/utils/api';
 import { getTestDatabase, cleanupDatabase, closeTestDatabase } from '@/test/utils/db';
@@ -64,7 +68,7 @@ describe('/api/analytics/revenue', () => {
     it('should return 401 when not authenticated', async () => {
       auth.mockResolvedValue(null);
       
-      const response = await testApi.get(GET, 'http://localhost:3000/api/analytics/revenue', null);
+      const response = await testApi.get(GET, 'http://localhost:3000/api/analytics/revenue', undefined);
       expectApiError(response, 401, 'Unauthorized');
     });
 

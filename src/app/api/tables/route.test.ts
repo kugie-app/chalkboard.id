@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 import { GET, POST } from './route';
 import { testApi, expectApiSuccess, expectApiError } from '@/test/utils/api';
 import { getTestDatabase, cleanupDatabase, closeTestDatabase } from '@/test/utils/db';
@@ -35,7 +39,7 @@ describe('/api/tables', () => {
     it('should return 401 when not authenticated', async () => {
       auth.mockResolvedValue(null);
       
-      const response = await testApi.get(GET, 'http://localhost:3000/api/tables', null);
+      const response = await testApi.get(GET, 'http://localhost:3000/api/tables', undefined);
       expectApiError(response, 401, 'Unauthorized');
     });
 
@@ -113,7 +117,7 @@ describe('/api/tables', () => {
         POST,
         'http://localhost:3000/api/tables',
         { name: 'Table 1' },
-        null
+        undefined
       );
       
       expectApiError(response, 401, 'Unauthorized');

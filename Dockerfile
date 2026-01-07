@@ -70,17 +70,47 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 
 # Copy package.json and bun.lock for bun scripts (migrations, seeding)
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/bun.lock* ./
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/bun.lock* ./
 
-# Copy database related files
-COPY --from=builder /app/drizzle ./drizzle
-COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+# Copy database related files (with proper ownership)
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
+
+# Copy source files needed for migrations (with proper ownership)
+COPY --from=builder --chown=nextjs:nodejs /app/src ./src
+# Copy node_modules to run bun scripts
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+# Copy TypeScript config for drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Create startup script before switching to nextjs user
+RUN echo '#!/bin/sh' > /app/startup.sh && \
+    echo 'echo "🚀 Starting up..."' >> /app/startup.sh && \
+    echo '' >> /app/startup.sh && \
+    echo '# Wait for database to be ready' >> /app/startup.sh && \
+    echo 'echo "⏳ Waiting for database..."' >> /app/startup.sh && \
+    echo 'for i in $(seq 1 30); do' >> /app/startup.sh && \
+    echo '  if pg_isready -h $(echo $DATABASE_URL | sed -n "s/.*@\([^:]*\).*/\1/p") -p 5432 > /dev/null 2>&1; then' >> /app/startup.sh && \
+    echo '    echo "✅ Database is ready!"' >> /app/startup.sh && \
+    echo '    break' >> /app/startup.sh && \
+    echo '  fi' >> /app/startup.sh && \
+    echo '  echo "Waiting for database... ($i/30)"' >> /app/startup.sh && \
+    echo '  sleep 1' >> /app/startup.sh && \
+    echo 'done' >> /app/startup.sh && \
+    echo '' >> /app/startup.sh && \
+    echo 'echo "🔄 Running database migrations..."' >> /app/startup.sh && \
+    echo 'bun run db:push || { echo "⚠️  Migration failed, but continuing..."; }' >> /app/startup.sh && \
+    echo '' >> /app/startup.sh && \
+    echo 'echo "✅ Starting application..."' >> /app/startup.sh && \
+    echo 'exec node server.js' >> /app/startup.sh && \
+    chmod +x /app/startup.sh && \
+    chown nextjs:nodejs /app/startup.sh
 
 USER nextjs
 
@@ -91,4 +121,5 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
+
+CMD ["/app/startup.sh"]

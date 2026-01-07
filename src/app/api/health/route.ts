@@ -1,45 +1,51 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
+import { quickHealthCheck, getStartupStatus } from '@/lib/startup-checker';
 
-export async function GET() {
-  const timestamp = new Date().toISOString()
-  
+export async function GET(request: NextRequest) {
   try {
-    // Basic health check without database dependency during startup
-    const health: any = {
-      status: 'healthy',
-      timestamp,
-      version: process.env.npm_package_version || '4.0.0',
-      environment: process.env.NODE_ENV || 'development',
-      deployment: process.env.DEPLOYMENT_MODE || 'unknown',
-      port: process.env.PORT || '3000'
-    }
+    const { searchParams } = new URL(request.url);
+    const detailed = searchParams.get('detailed') === 'true';
 
-    // Try database connection with timeout, but don't fail health check if DB is temporarily unavailable
-    try {
-      const { db } = await import('@/lib/db')
-      await Promise.race([
-        db.execute('SELECT 1'),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Database timeout')), 5000))
-      ])
-      health.database = 'connected'
-    } catch (dbError) {
-      console.warn('Database check failed during health check:', dbError)
-      health.database = 'unavailable'
-      // Don't fail the health check for database issues during startup
+    if (detailed) {
+      // Return detailed startup status
+      const status = await getStartupStatus();
+      
+      return NextResponse.json({
+        status: status.isReady ? 'healthy' : 'unhealthy',
+        ready: status.isReady,
+        startupTime: status.startupTime,
+        timestamp: status.timestamp,
+        health: status.healthReport,
+        errors: status.errors,
+        warnings: status.warnings,
+        version: process.env.npm_package_version || '4.0.0',
+        environment: process.env.NODE_ENV || 'development',
+        deployment: process.env.DEPLOYMENT_MODE || 'unknown',
+      });
+    } else {
+      // Return quick health check
+      const health = await quickHealthCheck();
+      
+      return NextResponse.json({
+        status: health.status,
+        checks: health.checks,
+        timestamp: health.timestamp,
+        uptime: process.uptime(),
+        version: process.env.npm_package_version || '4.0.0',
+        environment: process.env.NODE_ENV || 'development',
+        deployment: process.env.DEPLOYMENT_MODE || 'unknown',
+      });
     }
-    
-    return NextResponse.json(health, { status: 200 })
   } catch (error) {
-    console.error('Health check failed:', error)
-    
     return NextResponse.json(
-      { 
+      {
         status: 'unhealthy',
-        timestamp,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        environment: process.env.NODE_ENV || 'development'
+        error: error instanceof Error ? error.message : 'Health check failed',
+        timestamp: new Date(),
+        version: process.env.npm_package_version || '4.0.0',
+        environment: process.env.NODE_ENV || 'development',
       },
       { status: 503 }
-    )
+    );
   }
 }

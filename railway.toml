@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "bun install && bun run build:railway"
+buildCommand = "bun install && bun run db:push && bun run build:railway"
 
 [deploy]
 startCommand = "node server.js"
@@ -21,7 +21,6 @@ NEXTAUTH_SECRET = "${NEXTAUTH_SECRET}"
 # Application-specific environment variables
 DEFAULT_LOCALE = "en"
 DB_POOLING = "true"
-AUTO_MIGRATION = "true"
 
 [services.web]
 name = "chalkboard-web"

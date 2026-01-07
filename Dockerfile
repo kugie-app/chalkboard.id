@@ -77,9 +77,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/bun.lock* ./
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
 
-# Copy entrypoint script (before USER nextjs)
-COPY docker-entrypoint.sh /app/
-RUN chmod +x /app/docker-entrypoint.sh
 
 # Copy source files needed for migrations (with proper ownership)
 COPY --from=builder --chown=nextjs:nodejs /app/src ./src
@@ -93,9 +90,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Change ownership of entrypoint script to nextjs user (before USER directive)
-RUN chown nextjs:nodejs /app/docker-entrypoint.sh
-
 USER nextjs
 
 EXPOSE 3000
@@ -106,4 +100,4 @@ ENV PORT=3000
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
 
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["node", "server.js"]

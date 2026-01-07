@@ -2,6 +2,7 @@
 builder = "dockerfile"
 
 [deploy]
+preDeployCommand = "bun run db:push --force"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"

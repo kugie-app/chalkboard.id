@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Chalkboard",
+  "version": "1.0.0",
+  "identifier": "com.kugie.chalkboard",
+  "build": {
+    "frontendDist": "../.next/standalone",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "DEPLOYMENT_MODE=desktop bun run dev",
+    "beforeBuildCommand": "DEPLOYMENT_MODE=desktop bun run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Chalkboard - Billiard Hall Management",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1024,
+        "minHeight": 768,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "shortDescription": "Billiard Hall Management System",
+    "longDescription": "Professional billiard hall management system with table tracking, F&B orders, and payment processing",
+    "publisher": "Kugie",
+    "copyright": "Copyright © 2024-2026 Kugie. All rights reserved.",
+    "category": "Business",
+    "fileAssociations": []
+  }
+}

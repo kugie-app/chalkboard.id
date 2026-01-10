@@ -1,6 +1,4 @@
 # Docker Compose for local PostgreSQL (Standalone mode)
-version: '3.8'
-
 services:
   # PostgreSQL database for standalone deployment
   postgres:
@@ -32,7 +30,7 @@ services:
     container_name: chalkboard-pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@chalkboard.local
+      PGADMIN_DEFAULT_EMAIL: admin@chalkboard.dev
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_LISTEN_PORT: 80
     ports:

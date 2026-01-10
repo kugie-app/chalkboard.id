@@ -1,4 +1,4 @@
-# 🎱 Chalkboard.id v1.0.0
+# 🎱 Chalkboard.id v1.0.3
 
 A comprehensive billiard hall management system built with Next.js 15, React 19, and TypeScript. Manage table sessions, F&B orders, payments, staff, and analytics with ease.
 
@@ -8,7 +8,7 @@ A comprehensive billiard hall management system built with Next.js 15, React 19,
 
 One-click deploy to Railway with automatic PostgreSQL database:
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/zY4yoW?referralCode=D8ivdW&utm_medium=integration&utm_source=template&utm_campaign=generic)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/chalkboardid?referralCode=D8ivdW&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 ### Docker (Recommended for Self-Hosting)
 
@@ -308,4 +308,4 @@ For support and questions, please contact the development team or create an issu
 
 ---
 
-**Chalkboard.id** - Streamlining billiard hall operations with modern technology.
+**Chalkboard.id** - Streamlining billiard hall operations with modern technology. Built by [kugie.app](https://kugie.app) and the open source community

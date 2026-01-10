@@ -172,14 +172,22 @@ echo   Windows Standalone Installer
 echo ====================================
 echo.
 
-REM Check if PostgreSQL is installed
-where psql >nul 2>nul
+REM Check for Administrator privileges
+net session >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo ⚠️  PostgreSQL not found. Please install PostgreSQL 12+ before running Chalkboard.id
-    echo    Download from: https://www.postgresql.org/download/windows/
+    echo [ERROR] Please run this installer as Administrator.
+    echo         Right-click install.bat and select "Run as administrator"
     echo.
     pause
     exit /b 1
+)
+
+REM Check if PostgreSQL is in PATH (optional - just a warning)
+where psql >nul 2>nul
+if %ERRORLEVEL% NEQ 0 (
+    echo [NOTE] PostgreSQL CLI not found in PATH - this is OK if you have a remote database
+    echo        or if PostgreSQL is installed but not added to PATH.
+    echo.
 )
 
 REM Create installation directory

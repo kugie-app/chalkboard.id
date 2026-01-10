@@ -30,6 +30,7 @@ import DurationManagement from "@/components/tables/DurationManagement";
 import MoveSessionModal from "@/components/tables/MoveSessionModal";
 import EnhancedBillingModal from "@/components/tables/EnhancedBillingModal";
 import { PricingPackage } from "@/schema";
+import { calculateTax as calculateTaxFromSettings, formatTaxLabel } from "@/lib/tax";
 
 // Helper function to format currency
 const formatCurrency = (amount: number | string) => {
@@ -446,7 +447,7 @@ const TablesManagement = () => {
   };
 
   const calculateTax = (subtotal: number) => {
-    return subtotal * 0.1; // 10% tax
+    return calculateTaxFromSettings(subtotal, taxSettings, false); // Use tax settings, isTable=false for F&B
   };
 
   // Process F&B Order
@@ -1501,7 +1502,7 @@ const TablesManagement = () => {
                               <span>{formatCurrency(calculateTotal())}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span>Tax (10%):</span>
+                              <span>{formatTaxLabel(taxSettings)}:</span>
                               <span>{formatCurrency(calculateTax(calculateTotal()))}</span>
                             </div>
                             <div className="flex justify-between font-bold text-base border-t pt-2">

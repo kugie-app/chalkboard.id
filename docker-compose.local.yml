@@ -1,6 +1,4 @@
 # Docker Compose for local PostgreSQL (Standalone mode)
-version: '3.8'
-
 services:
   # PostgreSQL database for standalone deployment
   postgres:

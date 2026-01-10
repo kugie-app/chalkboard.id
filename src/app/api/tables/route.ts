@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { tables } from '@/schema/tables';
 import { pricingPackages } from '@/schema/pricing-packages';
-import { eq } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 
 export async function GET() {
@@ -37,7 +37,8 @@ export async function GET() {
       })
       .from(tables)
       .leftJoin(pricingPackages, eq(tables.pricingPackageId, pricingPackages.id))
-      .where(eq(tables.isActive, true));
+      .where(eq(tables.isActive, true))
+      .orderBy(asc(tables.id));
     
     return NextResponse.json(allTables);
   } catch (error) {

@@ -214,7 +214,8 @@ const TablesManagement = () => {
       const response = await fetch('/api/tables');
       if (response.ok) {
         const data = await response.json();
-        setTables(data);
+        const sortedTables = data.sort((a: BilliardTable, b: BilliardTable) => a.id - b.id);
+        setTables(sortedTables);
         
         // Fetch current sessions for occupied tables
         data.forEach(async (table: BilliardTable) => {

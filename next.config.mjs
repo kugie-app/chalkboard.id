@@ -6,7 +6,7 @@ const withNextIntl = createNextIntlPlugin(
 
 /**
  * Get deployment mode from environment variable
- * @returns {'railway' | 'standalone' | 'edge' | 'node' | 'auto'}
+ * @returns {'desktop' | 'railway' | 'standalone' | 'edge' | 'node' | 'auto'}
  */
 function getDeploymentMode() {
     return process.env.DEPLOYMENT_MODE || detectDeploymentMode();
@@ -14,24 +14,29 @@ function getDeploymentMode() {
 
 /**
  * Auto-detect deployment mode based on environment
- * @returns {'railway' | 'standalone' | 'edge' | 'auto'}
+ * @returns {'desktop' | 'railway' | 'standalone' | 'edge' | 'auto'}
  */
 function detectDeploymentMode() {
+    // Check for desktop/Tauri environment
+    if (process.env.DEPLOYMENT_MODE === 'desktop') {
+        return 'desktop';
+    }
+
     // Check for Railway environment
     if (process.env.RAILWAY_ENVIRONMENT_NAME) {
         return 'railway';
     }
-    
+
     // Check for standalone Windows deployment
     if (process.env.IS_STANDALONE_WINDOWS === 'true' || process.env.NODE_ENV === 'standalone') {
         return 'standalone';
     }
-    
+
     // Check for edge environments
     if (process.env.VERCEL === '1' || process.env.NEXT_RUNTIME === 'edge') {
         return 'edge';
     }
-    
+
     return 'auto';
 }
 
@@ -41,15 +46,15 @@ function detectDeploymentMode() {
  */
 function shouldUseEdgeRuntime() {
     const mode = getDeploymentMode();
-    
+
     if (mode === 'edge') {
         return true;
     }
-    
-    if (mode === 'railway' || mode === 'standalone' || mode === 'node') {
+
+    if (mode === 'railway' || mode === 'standalone' || mode === 'node' || mode === 'desktop') {
         return false;
     }
-    
+
     // Auto mode: use edge runtime if deploying to Vercel
     return process.env.VERCEL === '1';
 }
@@ -60,17 +65,23 @@ function shouldUseEdgeRuntime() {
  */
 function getOutputMode() {
     const mode = getDeploymentMode();
-    
+
+    // Desktop mode uses standalone (runs Next.js server in Tauri)
+    // This allows API routes to work properly
+    if (mode === 'desktop') {
+        return 'standalone';
+    }
+
     // Railway and standalone always use standalone output
     if (mode === 'railway' || mode === 'standalone') {
         return 'standalone';
     }
-    
+
     // Edge deployments typically don't need standalone
     if (mode === 'edge') {
         return undefined;
     }
-    
+
     // Default to standalone for better compatibility
     return 'standalone';
 }
@@ -84,10 +95,10 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: true, // Temporarily ignore TypeScript errors
     },
-    images: { 
+    images: {
         unoptimized: true,
-        // Optimize for local files in standalone mode
-        ...(getDeploymentMode() === 'standalone' && {
+        // Optimize for local files in standalone and desktop modes
+        ...((getDeploymentMode() === 'standalone' || getDeploymentMode() === 'desktop') && {
             domains: ['localhost', '127.0.0.1'],
         }),
     },
@@ -103,7 +114,7 @@ const nextConfig = {
     // Configure webpack for conditional imports and deployment optimizations
     webpack: (config, { isServer }) => {
         const mode = getDeploymentMode();
-        
+
         if (shouldUseEdgeRuntime()) {
             // Alias postgres imports to neon for edge runtime
             config.resolve.alias = {
@@ -112,7 +123,19 @@ const nextConfig = {
                 'drizzle-orm/postgres-js': 'drizzle-orm/neon-http',
             };
         }
-        
+
+        // Desktop mode optimizations for PGlite
+        if (mode === 'desktop') {
+            // Static export doesn't have server-side rendering
+            // All code runs in the browser
+            config.resolve.fallback = {
+                ...config.resolve.fallback,
+                fs: false,
+                net: false,
+                tls: false,
+            };
+        }
+
         // Standalone mode optimizations
         if (mode === 'standalone') {
             // Bundle additional Node.js modules for standalone
@@ -123,9 +146,9 @@ const nextConfig = {
                     apply(target, thisArg, argumentsList) {
                         const [item] = argumentsList;
                         // Keep these modules bundled for standalone
-                        if (typeof item === 'string' && 
-                            (item.includes('postgres') || 
-                             item.includes('@neondatabase') || 
+                        if (typeof item === 'string' &&
+                            (item.includes('postgres') ||
+                             item.includes('@neondatabase') ||
                              item.includes('drizzle'))) {
                             return thisArg.length; // Don't add to externals
                         }
@@ -134,7 +157,7 @@ const nextConfig = {
                 });
             }
         }
-        
+
         // Railway optimizations
         if (mode === 'railway') {
             // Optimize bundle size for Railway deployment
@@ -145,7 +168,7 @@ const nextConfig = {
                 crypto: false,
             };
         }
-        
+
         return config;
     },
     

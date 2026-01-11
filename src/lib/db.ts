@@ -1,7 +1,9 @@
 import { drizzle as drizzlePostgres } from 'drizzle-orm/postgres-js';
 import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
+import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
 import postgres from 'postgres';
 import { neon } from '@neondatabase/serverless';
+import { PGlite } from '@electric-sql/pglite';
 import * as schema from '@/schema';
 import { getDeploymentConfig, validateDeploymentConfig } from './deployment-config';
 
@@ -16,9 +18,31 @@ validateDeploymentConfig();
 const config = getDeploymentConfig();
 
 /**
+ * Get database directory path for PGlite
+ * In browser (dev mode): use indexedDB
+ * In production/build: use file system path
+ */
+function getPgliteDataDir(): string {
+  // For now, use indexedDB for development (will update for Tauri later)
+  // When in Tauri, we'll use the app data directory
+  if (typeof window !== 'undefined' && '__TAURI__' in window) {
+    // TODO: Use Tauri path API to get app data directory
+    // For now, use a default path
+    return './chalkboard-data';
+  }
+  // Use indexedDB for browser/dev mode
+  return 'idb://chalkboard-db';
+}
+
+/**
  * Create database connection string based on configuration
  */
-function createConnectionString(): string {
+function createConnectionString(): string | null {
+  // PGlite doesn't use connection strings
+  if (config.provider === 'pglite') {
+    return null;
+  }
+
   // Use DATABASE_URL if provided (Railway and most other providers set this)
   if (process.env.DATABASE_URL) {
     return process.env.DATABASE_URL;
@@ -36,7 +60,7 @@ function createConnectionString(): string {
 
 const connectionString = createConnectionString();
 
-if (!connectionString) {
+if (!connectionString && config.provider !== 'pglite') {
   throw new Error('DATABASE_URL environment variable is required or database configuration is incomplete');
 }
 
@@ -44,9 +68,16 @@ if (!connectionString) {
  * Create database connection based on deployment configuration and provider
  */
 function createDatabaseConnection() {
+  // Use PGlite for desktop mode
+  if (config.provider === 'pglite') {
+    const dataDir = getPgliteDataDir();
+    const pglite = new PGlite(dataDir);
+    return drizzlePglite(pglite, { schema });
+  }
+
   // Use serverless connection for Neon or edge runtime
   if (config.database.useServerless || config.provider === 'neon') {
-    const sql = neon(connectionString);
+    const sql = neon(connectionString!);
     return drizzleNeon(sql, { schema });
   }
 
@@ -75,7 +106,7 @@ function createDatabaseConnection() {
     clientConfig.idle_timeout = 300; // Keep connections longer for standalone
   }
 
-  const client = postgres(connectionString, clientConfig);
+  const client = postgres(connectionString!, clientConfig);
   return drizzlePostgres(client, { schema });
 }
 

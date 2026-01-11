@@ -95,7 +95,8 @@ const ChalkBoardDashboard = () => {
       const response = await fetch('/api/tables');
       if (response.ok) {
         const data = await response.json();
-        setTables(data);
+        const sortedTables = data.sort((a: Table, b: Table) => a.id - b.id);
+        setTables(sortedTables);
         
         // Calculate stats
         const totalTables = data.length;

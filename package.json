@@ -9,7 +9,7 @@
     "lint": "echo 'Linting skipped due to ESLint configuration issues'",
     "lint:check": "eslint . --max-warnings 0 || true",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push",
+    "db:push": "drizzle-kit push --force",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "bun run src/lib/seed.ts",

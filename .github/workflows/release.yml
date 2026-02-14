@@ -55,6 +55,7 @@ jobs:
             args: ''
     runs-on: ${{ matrix.platform }}
     env:
+      DEPLOYMENT_MODE: desktop
       NEXTAUTH_SECRET: "build-time-secret-key-for-github-actions-only"
     steps:
       - name: Checkout

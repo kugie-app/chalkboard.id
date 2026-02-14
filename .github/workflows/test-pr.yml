@@ -91,18 +91,20 @@ jobs:
 
   build-tauri:
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: ubuntu-22.04
-            rust-targets: ''
           - platform: macos-latest
             rust-targets: 'aarch64-apple-darwin'
+          - platform: ubuntu-22.04
+            rust-targets: ''
+            main-only: true
           - platform: windows-latest
             rust-targets: ''
+            main-only: true
     runs-on: ${{ matrix.platform }}
+    if: ${{ !matrix.main-only || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
     env:
       DEPLOYMENT_MODE: desktop
       NEXTAUTH_SECRET: "build-time-secret-key-for-github-actions-only"
@@ -196,13 +198,14 @@ jobs:
           fi
 
       - name: Check Tauri build results
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          if [[ "${{ needs.build-tauri.result }}" != "success" ]]; then
+          if [[ "${{ needs.build-tauri.result }}" == "success" ]]; then
+            echo "✅ Tauri build passed"
+          elif [[ "${{ needs.build-tauri.result }}" == "skipped" ]]; then
+            echo "ℹ️ Some Tauri builds skipped (main-only platforms)"
+          else
             echo "❌ Tauri build failed"
             exit 1
-          else
-            echo "✅ Tauri build passed"
           fi
 
       - name: Check Docker build results
@@ -225,7 +228,8 @@ jobs:
               echo "⚠️ Unit tests failed"
             fi
             echo "✅ Standard build succeeded"
-            echo "ℹ️ Tauri and Docker builds skipped for PR"
+            echo "✅ Tauri macOS aarch64 build checked"
+            echo "ℹ️ Other Tauri and Docker builds skipped for PR"
           else
             echo "🎉 All builds completed!"
             if [[ "${{ needs.test.result }}" == "success" ]]; then

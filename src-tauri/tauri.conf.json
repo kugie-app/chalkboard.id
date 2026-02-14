@@ -6,7 +6,7 @@
   "build": {
     "frontendDist": "../.next/standalone",
     "devUrl": "http://localhost:3000",
-    "beforeBuildCommand": "bun run build:desktop"
+    "beforeBuildCommand": "bun run build:desktop && node scripts/clean-tauri-dist.mjs"
   },
   "app": {
     "windows": [

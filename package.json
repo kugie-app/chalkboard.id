@@ -17,6 +17,7 @@
     "build:node": "DEPLOYMENT_MODE=node next build",
     "build:auto": "DEPLOYMENT_MODE=auto next build",
     "build:railway": "DEPLOYMENT_MODE=railway next build",
+    "build:desktop": "next build",
     "build:standalone": "DEPLOYMENT_MODE=standalone next build",
     "deploy:check": "bun run src/lib/deployment-check.ts",
     "docker:build": "docker compose build",

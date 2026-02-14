@@ -6,7 +6,7 @@
   "build": {
     "frontendDist": "../.next/standalone",
     "devUrl": "http://localhost:3000",
-    "beforeBuildCommand": "DEPLOYMENT_MODE=desktop bun run build"
+    "beforeBuildCommand": "bun run build:desktop"
   },
   "app": {
     "windows": [

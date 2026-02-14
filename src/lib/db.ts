@@ -96,6 +96,8 @@ function createDatabaseConnection() {
     const dataDir = getPgliteDataDir();
     let db: ReturnType<typeof drizzlePglite>;
     if (!dataDir.startsWith('idb://')) {
+      const fs = require('fs');
+      fs.mkdirSync(dataDir, { recursive: true });
       const { NodeFS } = require('@electric-sql/pglite/nodefs');
       const pglite = new PGlite({ fs: new NodeFS(dataDir) });
       db = drizzlePglite(pglite, { schema });

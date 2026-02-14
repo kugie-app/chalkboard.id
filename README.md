@@ -24,16 +24,22 @@ docker compose up
 
 [🐳 View on Docker Hub](https://hub.docker.com/r/kugieapp/chalkboard)
 
-### Windows Standalone (Recommended for Local)
+### Desktop App (Recommended for Local)
 
-Self-contained Windows executable with auto-update support:
+Native desktop application powered by [Tauri v2](https://v2.tauri.app/) with an embedded database — no PostgreSQL setup required:
 
-1. Download the latest release
-2. Run `install.bat` as Administrator
-3. Configure PostgreSQL connection
-4. Launch from desktop shortcut
+| Platform | Installer |
+|----------|-----------|
+| **macOS (Apple Silicon)** | `.dmg` |
+| **macOS (Intel)** | `.dmg` |
+| **Windows** | `.msi` or `.exe` (NSIS) |
+| **Linux** | `.deb`, `.AppImage`, `.rpm` |
 
-[📥 Download Windows Release](https://github.com/kugie-app/chalkboard.id/releases)
+1. Download the installer for your platform from the latest release
+2. Install and launch — the embedded PGlite database is set up automatically
+3. No external database or server configuration needed
+
+[📥 Download Desktop App](https://github.com/kugie-app/chalkboard.id/releases)
 
 ## 🎯 Overview
 
@@ -43,9 +49,9 @@ This modern web application offers a complete solution for billiard hall operato
 
 | Deployment Mode | Use Case | Database | Auto-Update | Best For |
 |----------------|----------|----------|-------------|----------|
+| **Desktop App** | Local installation | Embedded PGlite | ✅ | Single-machine use, no setup |
 | **Docker** | Container deployment | Any PostgreSQL | ❌ | VPS, dedicated servers, self-hosted |
 | **Railway** | Cloud hosting | Railway PostgreSQL | ❌ | Open source, cloud deployment |
-| **Windows Standalone** | Local installation | Local PostgreSQL | ✅ | Self-hosted, multiple versions |
 | **Vercel Edge** | Serverless | Neon PostgreSQL | ❌ | High-performance, global |
 
 ## ✨ Key Features
@@ -99,8 +105,13 @@ This modern web application offers a complete solution for billiard hall operato
 
 ### Backend & Database
 - **Drizzle ORM** with PostgreSQL
+- **PGlite** for embedded database in desktop mode
 - **Neon Database** for cloud-hosted PostgreSQL
 - **NextAuth.js** for authentication
+
+### Desktop
+- **Tauri v2** for native cross-platform desktop builds (macOS, Windows, Linux)
+- **Rust** backend for native OS integration
 
 ### UI/UX Libraries
 - **Headless UI** for accessible components
@@ -116,6 +127,7 @@ This modern web application offers a complete solution for billiard hall operato
 ## 📁 Project Structure
 
 ```
+src-tauri/                    # Tauri desktop app (Rust)
 src/
 ├── app/                      # Next.js App Router
 │   ├── [locale]/            # Internationalization routes

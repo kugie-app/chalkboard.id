@@ -35,47 +35,66 @@ jobs:
       - name: Build check
         run: bun run build
 
-  build-windows:
+  build-tauri:
     needs: test
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-22.04
+            rust-targets: ''
+            args: ''
+          - platform: macos-latest
+            rust-targets: 'aarch64-apple-darwin'
+            args: '--target aarch64-apple-darwin'
+          - platform: macos-latest
+            rust-targets: 'x86_64-apple-darwin'
+            args: '--target x86_64-apple-darwin'
+          - platform: windows-latest
+            rust-targets: ''
+            args: ''
+    runs-on: ${{ matrix.platform }}
     env:
-      DATABASE_URL: "postgresql://user:password@localhost:5432/chalkboard_build"
       NEXTAUTH_SECRET: "build-time-secret-key-for-github-actions-only"
-      NEXTAUTH_URL: "http://localhost:3000"
-      DEPLOYMENT_MODE: "standalone"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          node-version: '20'
+          targets: ${{ matrix.rust-targets }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build standalone
-        run: bun run build:standalone
-
-      - name: Package Windows executable
-        run: bun run package:windows
-
-      - name: Create release archive
-        run: |
-          cd dist/release
-          tar -czf ../../chalkboard-windows-${{ github.ref_name }}.tar.gz *
-
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: windows-release
-          path: chalkboard-windows-${{ github.ref_name }}.tar.gz
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Chalkboard ${{ github.ref_name }}'
+          releaseBody: ''
+          releaseDraft: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          args: ${{ matrix.args }}
 
   build-docker:
     needs: test
@@ -126,44 +145,37 @@ jobs:
           cache-to: type=gha,mode=max
 
   create-release:
-    needs: [build-windows, build-docker]
+    needs: [build-tauri, build-docker]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
         with:
-          name: windows-release
+          fetch-depth: 0
 
-      - name: Generate changelog
-        id: changelog
+      - name: Generate changelog and update release
         run: |
-          # Simple changelog generation
+          # Generate changelog
           echo "## What's Changed" > CHANGELOG.md
-          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD~1)..HEAD >> CHANGELOG.md || echo "- Initial release" >> CHANGELOG.md
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "HEAD~10")..HEAD >> CHANGELOG.md || echo "- Initial release" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "## Docker Image" >> CHANGELOG.md
           echo "- \`docker pull kugieapp/chalkboard:${{ github.ref_name }}\`" >> CHANGELOG.md
           echo "- \`docker pull kugieapp/chalkboard:latest\`" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
-          echo "## Windows Standalone" >> CHANGELOG.md
-          echo "Download and extract the Windows release archive, then run \`install.bat\` as Administrator." >> CHANGELOG.md
+          echo "## Desktop Apps" >> CHANGELOG.md
+          echo "Download the installer for your platform from the assets below:" >> CHANGELOG.md
+          echo "- **macOS (Apple Silicon):** \`.dmg\` (aarch64)" >> CHANGELOG.md
+          echo "- **macOS (Intel):** \`.dmg\` (x86_64)" >> CHANGELOG.md
+          echo "- **Windows:** \`.msi\` or \`.exe\` (NSIS)" >> CHANGELOG.md
+          echo "- **Linux:** \`.deb\`, \`.AppImage\`, or \`.rpm\`" >> CHANGELOG.md
 
-      - name: Create Release
+      - name: Update release from draft to published
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            chalkboard-windows-${{ github.ref_name }}.tar.gz
           body_path: CHANGELOG.md
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update latest tags
-        if: ${{ !contains(github.ref_name, '-') }}
-        run: |
-          # Update latest tag for stable releases only
-          echo "Stable release detected, updating latest tags"

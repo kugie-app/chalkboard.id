@@ -89,37 +89,57 @@ jobs:
       - name: Build check
         run: bun run build
 
-  build-windows:
+  build-tauri:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-22.04
+            rust-targets: ''
+          - platform: macos-latest
+            rust-targets: 'aarch64-apple-darwin'
+          - platform: windows-latest
+            rust-targets: ''
+    runs-on: ${{ matrix.platform }}
     env:
-      DATABASE_URL: "postgresql://user:password@localhost:5432/chalkboard_build"
       NEXTAUTH_SECRET: "build-time-secret-key-for-github-actions-only"
-      NEXTAUTH_URL: "http://localhost:3000"
-      DEPLOYMENT_MODE: "standalone"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          node-version: '20'
+          targets: ${{ matrix.rust-targets }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build standalone
-        run: bun run build:standalone
-
-      - name: Package Windows executable
-        run: bun run package:windows
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ${{ matrix.rust-targets && format('--target {0}', matrix.rust-targets) || '' }}
+          uploadWorkflowArtifacts: true
 
   build-docker:
     needs: test
@@ -152,7 +172,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   summary:
-    needs: [test, build, build-windows, build-docker]
+    needs: [test, build, build-tauri, build-docker]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -174,14 +194,14 @@ jobs:
             echo "✅ Standard build passed"
           fi
 
-      - name: Check Windows build results
+      - name: Check Tauri build results
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          if [[ "${{ needs.build-windows.result }}" != "success" ]]; then
-            echo "❌ Windows build failed"
+          if [[ "${{ needs.build-tauri.result }}" != "success" ]]; then
+            echo "❌ Tauri build failed"
             exit 1
           else
-            echo "✅ Windows build passed"
+            echo "✅ Tauri build passed"
           fi
 
       - name: Check Docker build results
@@ -204,7 +224,7 @@ jobs:
               echo "⚠️ Unit tests failed"
             fi
             echo "✅ Standard build succeeded"
-            echo "ℹ️ Windows and Docker builds skipped for PR"
+            echo "ℹ️ Tauri and Docker builds skipped for PR"
           else
             echo "🎉 All builds completed!"
             if [[ "${{ needs.test.result }}" == "success" ]]; then
@@ -213,6 +233,6 @@ jobs:
               echo "⚠️ Unit tests failed (but builds continued)"
             fi
             echo "✅ Standard build succeeded"
-            echo "✅ Windows standalone build succeeded"  
+            echo "✅ Tauri desktop builds succeeded"
             echo "✅ Docker build succeeded"
           fi

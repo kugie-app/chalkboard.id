@@ -89,22 +89,54 @@ jobs:
       - name: Build check
         run: bun run build
 
+  build-tauri-check:
+    needs: test
+    runs-on: macos-latest
+    env:
+      DEPLOYMENT_MODE: desktop
+      NEXTAUTH_SECRET: "build-time-secret-key-for-github-actions-only"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Tauri app (macOS aarch64)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target aarch64-apple-darwin
+          uploadWorkflowArtifacts: true
+
   build-tauri:
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-latest
-            rust-targets: 'aarch64-apple-darwin'
           - platform: ubuntu-22.04
             rust-targets: ''
-            main-only: true
           - platform: windows-latest
             rust-targets: ''
-            main-only: true
     runs-on: ${{ matrix.platform }}
-    if: ${{ !matrix.main-only || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
     env:
       DEPLOYMENT_MODE: desktop
       NEXTAUTH_SECRET: "build-time-secret-key-for-github-actions-only"
@@ -175,7 +207,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   summary:
-    needs: [test, build, build-tauri, build-docker]
+    needs: [test, build, build-tauri-check, build-tauri, build-docker]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -199,12 +231,18 @@ jobs:
 
       - name: Check Tauri build results
         run: |
-          if [[ "${{ needs.build-tauri.result }}" == "success" ]]; then
-            echo "✅ Tauri build passed"
-          elif [[ "${{ needs.build-tauri.result }}" == "skipped" ]]; then
-            echo "ℹ️ Some Tauri builds skipped (main-only platforms)"
+          if [[ "${{ needs.build-tauri-check.result }}" != "success" ]]; then
+            echo "❌ Tauri macOS aarch64 build failed"
+            exit 1
           else
-            echo "❌ Tauri build failed"
+            echo "✅ Tauri macOS aarch64 build passed"
+          fi
+          if [[ "${{ needs.build-tauri.result }}" == "success" ]]; then
+            echo "✅ Tauri platform builds passed"
+          elif [[ "${{ needs.build-tauri.result }}" == "skipped" ]]; then
+            echo "ℹ️ Tauri platform builds skipped (main-only)"
+          else
+            echo "❌ Tauri platform builds failed"
             exit 1
           fi
 

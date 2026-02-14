@@ -1,11 +1,16 @@
 import NextAuth, { AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
-import { db } from './db';
+import { db, dbReady } from './db';
 import { users } from '@/schema/auth';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { getServerSession } from 'next-auth';
+
+// Ensure NEXTAUTH_SECRET has a fallback for desktop mode
+if (!process.env.NEXTAUTH_SECRET && process.env.DEPLOYMENT_MODE === 'desktop') {
+  process.env.NEXTAUTH_SECRET = 'chalkboard-desktop-secret';
+}
 
 const authOptions: AuthOptions = {
   adapter: DrizzleAdapter(db),
@@ -28,7 +33,8 @@ const authOptions: AuthOptions = {
         const defaultEmail = process.env.DEFAULT_EMAIL;
         const defaultPassword = process.env.DEFAULT_PASSWORD;
 
-        if (credentials.email === defaultEmail && credentials.password === defaultPassword) {
+        if (defaultEmail && defaultPassword &&
+            credentials.email === defaultEmail && credentials.password === defaultPassword) {
           return {
             id: '1',
             email: defaultEmail,
@@ -36,6 +42,9 @@ const authOptions: AuthOptions = {
             role: 'admin',
           };
         }
+
+        // Ensure PGlite migrations are complete before querying
+        await dbReady;
 
         // Check database for user
         const user = await db.select()

@@ -3,9 +3,9 @@
  * Supports Railway deployment, Windows standalone, and traditional deployments
  */
 
-export type DeploymentMode = 'railway' | 'standalone' | 'edge' | 'node' | 'auto';
+export type DeploymentMode = 'desktop' | 'railway' | 'standalone' | 'edge' | 'node' | 'auto';
 export type RuntimeEnvironment = 'edge' | 'node';
-export type DatabaseProvider = 'railway' | 'local' | 'neon' | 'standard';
+export type DatabaseProvider = 'pglite' | 'railway' | 'local' | 'neon' | 'standard';
 
 export interface DeploymentConfig {
   mode: DeploymentMode;
@@ -25,6 +25,8 @@ export interface DeploymentConfig {
     dynamicImports: boolean;
     autoUpdate: boolean;
     localFiles: boolean;
+    embeddedDatabase: boolean;
+    offlineMode: boolean;
   };
   versioning: {
     currentVersion: string;
@@ -63,21 +65,26 @@ export function detectRuntime(): RuntimeEnvironment {
  * Detects deployment mode from environment
  */
 export function detectDeploymentMode(): DeploymentMode {
+  // Check for desktop Tauri app
+  if (typeof window !== 'undefined' && '__TAURI__' in window) {
+    return 'desktop';
+  }
+
   // Check for Railway environment
   if (process.env.RAILWAY_ENVIRONMENT_NAME) {
     return 'railway';
   }
-  
+
   // Check for standalone Windows deployment
   if (process.env.IS_STANDALONE_WINDOWS === 'true') {
     return 'standalone';
   }
-  
+
   // Check for edge environments
   if (process.env.VERCEL === '1' || process.env.NEXT_RUNTIME === 'edge') {
     return 'edge';
   }
-  
+
   // Default to auto detection
   return 'auto';
 }
@@ -86,23 +93,33 @@ export function detectDeploymentMode(): DeploymentMode {
  * Detects database provider from environment
  */
 export function detectDatabaseProvider(): DatabaseProvider {
+  // Desktop mode always uses PGlite
+  if (typeof window !== 'undefined' && '__TAURI__' in window) {
+    return 'pglite';
+  }
+
+  // Explicit desktop mode via environment
+  if (process.env.DEPLOYMENT_MODE === 'desktop') {
+    return 'pglite';
+  }
+
   const dbUrl = process.env.DATABASE_URL || '';
-  
+
   // Railway PostgreSQL detection
   if (process.env.RAILWAY_ENVIRONMENT_NAME || dbUrl.includes('railway.app')) {
     return 'railway';
   }
-  
+
   // Local PostgreSQL detection (for standalone)
   if (dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1') || dbUrl.includes('postgres://postgres:')) {
     return 'local';
   }
-  
+
   // Neon database detection
   if (dbUrl.includes('neon.tech')) {
     return 'neon';
   }
-  
+
   // Default to standard PostgreSQL
   return 'standard';
 }
@@ -133,7 +150,7 @@ export function getDeploymentConfig(): DeploymentConfig {
     provider,
     database: {
       useServerless: runtime === 'edge' || provider === 'neon',
-      pooling: runtime === 'node' && process.env.DB_POOLING !== 'false',
+      pooling: runtime === 'node' && provider !== 'pglite' && process.env.DB_POOLING !== 'false',
       host: process.env.DB_HOST,
       port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
       database: process.env.DB_NAME,
@@ -143,8 +160,10 @@ export function getDeploymentConfig(): DeploymentConfig {
     features: {
       streamingSSR: runtime === 'edge',
       dynamicImports: runtime === 'node',
-      autoUpdate: mode === 'standalone',
-      localFiles: mode === 'standalone',
+      autoUpdate: mode === 'standalone' || mode === 'desktop',
+      localFiles: mode === 'standalone' || mode === 'desktop',
+      embeddedDatabase: provider === 'pglite',
+      offlineMode: provider === 'pglite',
     },
     versioning: {
       currentVersion: version,
@@ -159,29 +178,37 @@ export function getDeploymentConfig(): DeploymentConfig {
  */
 export function validateDeploymentConfig(): void {
   const config = getDeploymentConfig();
-  
-  if (!process.env.DATABASE_URL) {
+
+  // Desktop mode doesn't require DATABASE_URL (uses PGlite)
+  if (config.provider !== 'pglite' && !process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL environment variable is required');
   }
-  
+
+  // Desktop-specific validations
+  if (config.mode === 'desktop') {
+    if (config.provider !== 'pglite') {
+      console.warn('Warning: Desktop mode detected but database provider is not PGlite');
+    }
+  }
+
   // Railway-specific validations
   if (config.mode === 'railway') {
     if (!process.env.RAILWAY_ENVIRONMENT_NAME) {
       console.warn('Warning: Railway mode detected but RAILWAY_ENVIRONMENT_NAME is not set');
     }
   }
-  
+
   // Standalone-specific validations
   if (config.mode === 'standalone') {
     if (!config.versioning.updateServerUrl && config.features.autoUpdate) {
       console.warn('Warning: Auto-update enabled but UPDATE_SERVER_URL is not configured');
     }
-    
-    if (config.provider === 'local' && !process.env.DATABASE_URL.includes('localhost')) {
+
+    if (config.provider === 'local' && !process.env.DATABASE_URL?.includes('localhost')) {
       console.warn('Warning: Standalone mode with local database but DATABASE_URL is not localhost');
     }
   }
-  
+
   // Edge runtime validations
   if (config.runtime === 'edge' && config.provider !== 'neon') {
     console.warn(
@@ -189,7 +216,7 @@ export function validateDeploymentConfig(): void {
       'Consider using Neon for optimal edge performance.'
     );
   }
-  
+
   if (config.mode === 'edge' && config.runtime === 'node') {
     console.warn(
       'Warning: DEPLOYMENT_MODE is set to "edge" but running in Node.js runtime. ' +
@@ -201,6 +228,8 @@ export function validateDeploymentConfig(): void {
 // Export convenience functions
 export const isEdgeRuntime = () => getDeploymentConfig().runtime === 'edge';
 export const isNodeRuntime = () => getDeploymentConfig().runtime === 'node';
+export const isDesktopMode = () => getDeploymentConfig().mode === 'desktop';
 export const isRailwayMode = () => getDeploymentConfig().mode === 'railway';
 export const isStandaloneMode = () => getDeploymentConfig().mode === 'standalone';
 export const useServerlessDB = () => getDeploymentConfig().database.useServerless;
+export const useEmbeddedDB = () => getDeploymentConfig().features.embeddedDatabase;

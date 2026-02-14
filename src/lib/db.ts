@@ -1,7 +1,9 @@
 import { drizzle as drizzlePostgres } from 'drizzle-orm/postgres-js';
 import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
+import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
 import postgres from 'postgres';
 import { neon } from '@neondatabase/serverless';
+import { PGlite } from '@electric-sql/pglite';
 import * as schema from '@/schema';
 import { getDeploymentConfig, validateDeploymentConfig } from './deployment-config';
 
@@ -16,9 +18,36 @@ validateDeploymentConfig();
 const config = getDeploymentConfig();
 
 /**
+ * Get database directory path for PGlite
+ * In browser (dev mode): use indexedDB
+ * In production/build: use file system path
+ */
+function getPgliteDataDir(): string {
+  if (process.env.DEPLOYMENT_MODE === 'desktop') {
+    const os = require('os');
+    const path = require('path');
+    const appName = 'com.kugie.chalkboard';
+    const platform = process.platform;
+    if (platform === 'win32') {
+      return path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), appName, 'data');
+    } else if (platform === 'darwin') {
+      return path.join(os.homedir(), 'Library', 'Application Support', appName, 'data');
+    } else {
+      return path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), '.local', 'share'), appName, 'data');
+    }
+  }
+  return 'idb://chalkboard-db';
+}
+
+/**
  * Create database connection string based on configuration
  */
-function createConnectionString(): string {
+function createConnectionString(): string | null {
+  // PGlite doesn't use connection strings
+  if (config.provider === 'pglite') {
+    return null;
+  }
+
   // Use DATABASE_URL if provided (Railway and most other providers set this)
   if (process.env.DATABASE_URL) {
     return process.env.DATABASE_URL;
@@ -36,17 +65,52 @@ function createConnectionString(): string {
 
 const connectionString = createConnectionString();
 
-if (!connectionString) {
+if (!connectionString && config.provider !== 'pglite') {
   throw new Error('DATABASE_URL environment variable is required or database configuration is incomplete');
+}
+
+/**
+ * Run Drizzle migrations on PGlite to ensure schema is up to date.
+ * Uses the generated migration files in the drizzle/ directory.
+ */
+let _dbReady: Promise<void> | null = null;
+
+async function runPgliteMigrations(db: ReturnType<typeof drizzlePglite>) {
+  try {
+    const { migrate } = require('drizzle-orm/pglite/migrator');
+    const path = require('path');
+    const migrationsFolder = path.join(process.cwd(), 'drizzle');
+    await migrate(db, { migrationsFolder });
+    console.log('✅ PGlite migrations applied successfully');
+  } catch (err) {
+    console.error('❌ PGlite migration failed:', err);
+  }
 }
 
 /**
  * Create database connection based on deployment configuration and provider
  */
 function createDatabaseConnection() {
+  // Use PGlite for desktop mode
+  if (config.provider === 'pglite') {
+    const dataDir = getPgliteDataDir();
+    let db: ReturnType<typeof drizzlePglite>;
+    if (!dataDir.startsWith('idb://')) {
+      const { NodeFS } = require('@electric-sql/pglite/nodefs');
+      const pglite = new PGlite({ fs: new NodeFS(dataDir) });
+      db = drizzlePglite(pglite, { schema });
+    } else {
+      const pglite = new PGlite(dataDir);
+      db = drizzlePglite(pglite, { schema });
+    }
+    // Auto-migrate on startup
+    _dbReady = runPgliteMigrations(db);
+    return db;
+  }
+
   // Use serverless connection for Neon or edge runtime
   if (config.database.useServerless || config.provider === 'neon') {
-    const sql = neon(connectionString);
+    const sql = neon(connectionString!);
     return drizzleNeon(sql, { schema });
   }
 
@@ -75,13 +139,16 @@ function createDatabaseConnection() {
     clientConfig.idle_timeout = 300; // Keep connections longer for standalone
   }
 
-  const client = postgres(connectionString, clientConfig);
+  const client = postgres(connectionString!, clientConfig);
   return drizzlePostgres(client, { schema });
 }
 
 export const db = createDatabaseConnection();
 
 export { schema };
+
+// Promise that resolves when PGlite migrations are complete (no-op for other providers)
+export const dbReady: Promise<void> = _dbReady ?? Promise.resolve();
 
 // Export connection info for debugging
 export const connectionInfo = {

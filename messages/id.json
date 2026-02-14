@@ -6,7 +6,7 @@
       "systemSubtitle": "Sistem Manajemen Billiard Hall",
       "email": "Email",
       "password": "Kata Sandi",
-      "helperText": "Belum punya akun? Hubungi administrator",
+      "helperText": "Belum punya akun?",
       "emailPlaceholder": "Masukkan email Anda",
       "passwordPlaceholder": "Masukkan kata sandi Anda",
       "loading": "Memuat...",
@@ -14,6 +14,20 @@
       "demoCredentials": "Kredensial Demo",
       "invalidCredentials": "Email atau kata sandi tidak valid",
       "signInError": "Terjadi kesalahan saat masuk"
+    },
+    "signup": {
+      "title": "Buat Akun",
+      "name": "Nama",
+      "namePlaceholder": "Masukkan nama Anda",
+      "email": "Email",
+      "emailPlaceholder": "Masukkan email Anda",
+      "password": "Kata Sandi",
+      "passwordPlaceholder": "Min 6 karakter",
+      "signup": "Buat Akun",
+      "loading": "Membuat akun...",
+      "hasAccount": "Sudah punya akun?",
+      "switchToSignin": "Masuk",
+      "switchToSignup": "Buat Akun"
     }
   },
   "TablesManagement": {

@@ -45,7 +45,6 @@
     "test:ci": "jest --ci --coverage --maxWorkers=2",
     "db:setup-test": "bun run scripts/setup-test-db.ts",
     "dev:desktop": "DEPLOYMENT_MODE=desktop bun run dev",
-    "build:desktop": "DEPLOYMENT_MODE=desktop next build",
     "tauri:dev": "concurrently \"bun run dev:desktop\" \"tauri dev\"",
     "tauri:build": "bun run build:desktop && tauri build",
     "tauri:build:windows": "tauri build --target x86_64-pc-windows-msvc",

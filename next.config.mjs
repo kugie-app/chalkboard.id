@@ -95,6 +95,10 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: true, // Temporarily ignore TypeScript errors
     },
+    // Externalize PGlite from server bundle so its WASM loading via import.meta.url works
+    ...(getDeploymentMode() === 'desktop' && {
+        serverExternalPackages: ['@electric-sql/pglite'],
+    }),
     images: {
         unoptimized: true,
         // Optimize for local files in standalone and desktop modes
@@ -124,10 +128,8 @@ const nextConfig = {
             };
         }
 
-        // Desktop mode optimizations for PGlite
-        if (mode === 'desktop') {
-            // Static export doesn't have server-side rendering
-            // All code runs in the browser
+        // Desktop mode: disable Node.js modules for client-side bundles only
+        if (mode === 'desktop' && !isServer) {
             config.resolve.fallback = {
                 ...config.resolve.fallback,
                 fs: false,

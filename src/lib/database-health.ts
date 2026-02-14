@@ -3,7 +3,7 @@
  * Validates database connection and schema readiness on startup
  */
 
-import { db } from './db';
+import { db, dbReady } from './db';
 import { sql } from 'drizzle-orm';
 import { getDeploymentConfig } from './deployment-config';
 
@@ -62,13 +62,13 @@ export async function checkDatabaseSchema(): Promise<DatabaseHealthCheck> {
     // List of core tables that should exist
     const coreTables = [
       'users',
-      'accounts', 
+      'accounts',
       'sessions',
-      'billiard_tables',
+      'tables',
       'table_sessions',
       'fnb_categories',
       'fnb_items',
-      'orders',
+      'fnb_orders',
       'payments'
     ];
 
@@ -225,7 +225,10 @@ export async function checkTableData(): Promise<DatabaseHealthCheck> {
  */
 export async function runStartupHealthChecks(): Promise<StartupHealthReport> {
   console.log('🔍 Running startup health checks...');
-  
+
+  // Wait for PGlite migrations to complete before checking schema
+  await dbReady;
+
   const config = getDeploymentConfig();
   
   // Run all checks in parallel

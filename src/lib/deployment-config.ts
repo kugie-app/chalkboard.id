@@ -204,7 +204,7 @@ export function validateDeploymentConfig(): void {
       console.warn('Warning: Auto-update enabled but UPDATE_SERVER_URL is not configured');
     }
 
-    if (config.provider === 'local' && !process.env.DATABASE_URL.includes('localhost')) {
+    if (config.provider === 'local' && !process.env.DATABASE_URL?.includes('localhost')) {
       console.warn('Warning: Standalone mode with local database but DATABASE_URL is not localhost');
     }
   }

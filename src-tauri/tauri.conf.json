@@ -6,7 +6,6 @@
   "build": {
     "frontendDist": "../.next/standalone",
     "devUrl": "http://localhost:3000",
-    "beforeDevCommand": "DEPLOYMENT_MODE=desktop bun run dev",
     "beforeBuildCommand": "DEPLOYMENT_MODE=desktop bun run build"
   },
   "app": {
@@ -23,7 +22,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: http://localhost:3000; connect-src 'self' http://localhost:* https://localhost:*; font-src 'self' data:"
     }
   },
   "bundle": {

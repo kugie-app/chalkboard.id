@@ -23,14 +23,19 @@ const config = getDeploymentConfig();
  * In production/build: use file system path
  */
 function getPgliteDataDir(): string {
-  // For now, use indexedDB for development (will update for Tauri later)
-  // When in Tauri, we'll use the app data directory
-  if (typeof window !== 'undefined' && '__TAURI__' in window) {
-    // TODO: Use Tauri path API to get app data directory
-    // For now, use a default path
-    return './chalkboard-data';
+  if (process.env.DEPLOYMENT_MODE === 'desktop') {
+    const os = require('os');
+    const path = require('path');
+    const appName = 'com.kugie.chalkboard';
+    const platform = process.platform;
+    if (platform === 'win32') {
+      return path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), appName, 'data');
+    } else if (platform === 'darwin') {
+      return path.join(os.homedir(), 'Library', 'Application Support', appName, 'data');
+    } else {
+      return path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), '.local', 'share'), appName, 'data');
+    }
   }
-  // Use indexedDB for browser/dev mode
   return 'idb://chalkboard-db';
 }
 
@@ -65,14 +70,42 @@ if (!connectionString && config.provider !== 'pglite') {
 }
 
 /**
+ * Run Drizzle migrations on PGlite to ensure schema is up to date.
+ * Uses the generated migration files in the drizzle/ directory.
+ */
+let _dbReady: Promise<void> | null = null;
+
+async function runPgliteMigrations(db: ReturnType<typeof drizzlePglite>) {
+  try {
+    const { migrate } = require('drizzle-orm/pglite/migrator');
+    const path = require('path');
+    const migrationsFolder = path.join(process.cwd(), 'drizzle');
+    await migrate(db, { migrationsFolder });
+    console.log('✅ PGlite migrations applied successfully');
+  } catch (err) {
+    console.error('❌ PGlite migration failed:', err);
+  }
+}
+
+/**
  * Create database connection based on deployment configuration and provider
  */
 function createDatabaseConnection() {
   // Use PGlite for desktop mode
   if (config.provider === 'pglite') {
     const dataDir = getPgliteDataDir();
-    const pglite = new PGlite(dataDir);
-    return drizzlePglite(pglite, { schema });
+    let db: ReturnType<typeof drizzlePglite>;
+    if (!dataDir.startsWith('idb://')) {
+      const { NodeFS } = require('@electric-sql/pglite/nodefs');
+      const pglite = new PGlite({ fs: new NodeFS(dataDir) });
+      db = drizzlePglite(pglite, { schema });
+    } else {
+      const pglite = new PGlite(dataDir);
+      db = drizzlePglite(pglite, { schema });
+    }
+    // Auto-migrate on startup
+    _dbReady = runPgliteMigrations(db);
+    return db;
   }
 
   // Use serverless connection for Neon or edge runtime
@@ -113,6 +146,9 @@ function createDatabaseConnection() {
 export const db = createDatabaseConnection();
 
 export { schema };
+
+// Promise that resolves when PGlite migrations are complete (no-op for other providers)
+export const dbReady: Promise<void> = _dbReady ?? Promise.resolve();
 
 // Export connection info for debugging
 export const connectionInfo = {

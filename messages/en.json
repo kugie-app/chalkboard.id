@@ -6,7 +6,7 @@
       "systemSubtitle": "Billiard Hall Management System",
       "email": "Email",
       "password": "Password",
-      "helperText": "Don't have an account? Contact administrator",
+      "helperText": "Don't have an account?",
       "emailPlaceholder": "Enter your email",
       "passwordPlaceholder": "Enter your password",
       "loading": "Signing in...",
@@ -14,6 +14,20 @@
       "demoCredentials": "Demo Credentials",
       "invalidCredentials": "Invalid email or password",
       "signInError": "An error occurred during sign in"
+    },
+    "signup": {
+      "title": "Create Account",
+      "name": "Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Min 6 characters",
+      "signup": "Create Account",
+      "loading": "Creating account...",
+      "hasAccount": "Already have an account?",
+      "switchToSignin": "Sign In",
+      "switchToSignup": "Create Account"
     }
   },
   "TablesManagement": {

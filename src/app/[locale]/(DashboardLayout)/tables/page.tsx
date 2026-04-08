@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Button, Badge, Modal, TextInput, Label, Select, Alert, Tabs } from "flowbite-react";
 import { 
   IconPlus, 
@@ -143,6 +143,7 @@ const TablesManagement = () => {
   const sessionHook = useSession();
   const { data: session, status } = sessionHook || { data: null, status: 'loading' };
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('TablesManagement');
   const tCards = useTranslations('TableCard');
   const tAlerts = useTranslations('Alerts');
@@ -797,10 +798,10 @@ const TablesManagement = () => {
         const paymentData = await response.json();
         // Print receipt
         printCheckoutReceipt(paymentData, finalBillingData);
-        showAlert('success', tAlerts('paymentProcessedSuccess'));
         setShowBillingModal(false);
         setBillingData(null);
-        fetchTables();
+        // Redirect to transactions page with payment modal auto-open
+        router.push(`/${locale}/transactions?paymentId=${paymentData.id}`);
       } else {
         const error = await response.json();
         showAlert('error', error.error || 'Failed to process payment');

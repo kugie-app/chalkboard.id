@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from 'next-intl';
 import CardBox from "@/components/shared/CardBox";
 import { Button, Badge, Table, Modal, Alert, Select, Label, TextInput } from "flowbite-react";
@@ -88,6 +88,7 @@ const TransactionsPage = () => {
   const sessionHook = useSession();
   const { data: session, status } = sessionHook || { data: null, status: 'loading' };
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations();
   const tAlerts = useTranslations('Alerts');
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -299,6 +300,20 @@ const TransactionsPage = () => {
       showAlert('error', tAlerts('failedToCancelPayment'));
     }
   };
+
+  // Auto-open payment modal when redirected from checkout with paymentId param
+  useEffect(() => {
+    const paymentId = searchParams.get('paymentId');
+    if (paymentId && payments.length > 0) {
+      const payment = payments.find(p => p.id === parseInt(paymentId));
+      if (payment) {
+        setSelectedPayment(payment);
+        setShowPaymentModal(true);
+        // Clean up the URL param
+        router.replace(window.location.pathname, { scroll: false });
+      }
+    }
+  }, [payments, searchParams]);
 
   const openPaymentModal = (payment: Payment) => {
     setSelectedPayment(payment);

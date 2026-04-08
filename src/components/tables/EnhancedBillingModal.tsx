@@ -371,13 +371,25 @@ const EnhancedBillingModal: React.FC<EnhancedBillingModalProps> = ({
           {currentBilling?.billing.fnbOrders && currentBilling.billing.fnbOrders.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-dark dark:text-white mb-3">
-                F&B Orders ({currentBilling?.billing.fnbOrders?.length})
+                F&B Orders
               </h3>
-              <div className="max-h-32 overflow-y-auto space-y-2">
-                {currentBilling?.billing.fnbOrders?.map((order: any, index: number) => (
-                  <div key={index} className="flex justify-between text-sm p-2 bg-lightgray rounded">
-                    <span>{order.orderNumber}</span>
-                    <span className="font-medium">{formatCurrency(parseFloat(order.total))}</span>
+              <div className="max-h-40 overflow-y-auto space-y-1">
+                {currentBilling?.billing.fnbOrders?.map((order: any, orderIndex: number) => (
+                  <div key={orderIndex}>
+                    {order.items && order.items.length > 0
+                      ? order.items.map((item: any, itemIndex: number) => (
+                          <div key={itemIndex} className="flex justify-between text-sm p-2 bg-lightgray rounded">
+                            <span>{item.quantity}x {item.itemName || 'Item'}</span>
+                            <span className="font-medium">{formatCurrency(parseFloat(item.subtotal))}</span>
+                          </div>
+                        ))
+                      : (
+                          <div className="flex justify-between text-sm p-2 bg-lightgray rounded">
+                            <span>{order.orderNumber}</span>
+                            <span className="font-medium">{formatCurrency(parseFloat(order.total))}</span>
+                          </div>
+                        )
+                    }
                   </div>
                 ))}
               </div>

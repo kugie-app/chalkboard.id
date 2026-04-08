@@ -831,10 +831,17 @@ const TablesManagement = () => {
           ? `<div class="section">
               <h3>F&B ORDERS</h3>
               ${billing.fnbOrders.map((order: any) =>
-                `<div class="item-row">
-                  <span class="item-name">${order.orderNumber}</span>
-                  <span class="item-price">${formatCurrencyReceipt(parseFloat(order.total))}</span>
-                </div>`
+                order.items && order.items.length > 0
+                  ? order.items.map((item: any) =>
+                      `<div class="item-row">
+                        <span class="item-name">${item.quantity}x ${item.itemName || 'Item'}</span>
+                        <span class="item-price">${formatCurrencyReceipt(parseFloat(item.subtotal))}</span>
+                      </div>`
+                    ).join('')
+                  : `<div class="item-row">
+                      <span class="item-name">${order.orderNumber}</span>
+                      <span class="item-price">${formatCurrencyReceipt(parseFloat(order.total))}</span>
+                    </div>`
               ).join('')}
             </div>`
           : '';

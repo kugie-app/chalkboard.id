@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { tables, tableSessions } from '@/schema/tables';
 import { pricingPackages } from '@/schema/pricing-packages';
-import { fnbOrders } from '@/schema/fnb';
+import { fnbOrders, fnbOrderItems, fnbItems } from '@/schema/fnb';
 import { payments } from '@/schema/payments';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
@@ -123,6 +123,24 @@ export async function POST(
         ));
     }
 
+    // Fetch item details for each F&B order
+    const fnbOrdersWithItems = await Promise.all(
+      fnbOrdersForTable.map(async (order) => {
+        const items = await db
+          .select({
+            id: fnbOrderItems.id,
+            itemName: fnbItems.name,
+            quantity: fnbOrderItems.quantity,
+            unitPrice: fnbOrderItems.unitPrice,
+            subtotal: fnbOrderItems.subtotal,
+          })
+          .from(fnbOrderItems)
+          .leftJoin(fnbItems, eq(fnbOrderItems.itemId, fnbItems.id))
+          .where(eq(fnbOrderItems.orderId, order.id));
+        return { ...order, items };
+      })
+    );
+
     // Calculate total F&B cost
     const fnbTotalCost = fnbOrdersForTable.reduce((total, order) => {
       return total + parseFloat(order.total);
@@ -172,7 +190,7 @@ export async function POST(
         fnbTax,
         totalTaxAmount,
         totalCost,
-        fnbOrders: fnbOrdersForTable,
+        fnbOrders: fnbOrdersWithItems,
         taxSettings
       },
       message: 'Billing recalculated successfully'

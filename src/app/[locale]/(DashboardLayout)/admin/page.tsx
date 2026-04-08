@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from 'next-intl';
-import { Alert, Card, Button, Label, TextInput, Checkbox } from "flowbite-react";
-import { IconSettings, IconCheck, IconX, IconPercentage } from "@tabler/icons-react";
+import { Alert, Card, Button, Label, TextInput, Checkbox, Select, Textarea } from "flowbite-react";
+import { IconSettings, IconCheck, IconX, IconPercentage, IconBuilding, IconUser } from "@tabler/icons-react";
 import DefaultSpinner from "@/components/ui-components/Spinner/DefaultSpinner";
 
 export default function AdminPage() {
@@ -21,6 +21,16 @@ export default function AdminPage() {
     applyToFnb: true
   });
   const [loading, setLoading] = useState(false);
+  const [storeSettings, setStoreSettings] = useState({
+    store_name: '',
+    store_address: '',
+    store_phone: '',
+    store_notes: ''
+  });
+  const [storeLoading, setStoreLoading] = useState(false);
+  const [staffList, setStaffList] = useState<{ id: number; name: string; role: string }[]>([]);
+  const [defaultStaffId, setDefaultStaffId] = useState('');
+  const [staffLoading, setStaffLoading] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -29,6 +39,8 @@ export default function AdminPage() {
       return;
     }
     fetchTaxSettings();
+    fetchStoreSettings();
+    fetchStaffData();
   }, [session, status, router]);
 
   const fetchTaxSettings = async () => {
@@ -40,6 +52,74 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error('Failed to fetch tax settings:', error);
+    }
+  };
+
+  const fetchStoreSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/settings');
+      if (response.ok) {
+        const data = await response.json();
+        const s = data.settings || {};
+        setStoreSettings({
+          store_name: s.store_name || '',
+          store_address: s.store_address || '',
+          store_phone: s.store_phone || '',
+          store_notes: s.store_notes || ''
+        });
+        setDefaultStaffId(s.default_staff_id || '');
+      }
+    } catch (error) {
+      console.error('Failed to fetch store settings:', error);
+    }
+  };
+
+  const fetchStaffData = async () => {
+    try {
+      const response = await fetch('/api/staff?active=true');
+      if (response.ok) {
+        const data = await response.json();
+        setStaffList(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch staff:', error);
+    }
+  };
+
+  const handleStoreSettingsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStoreLoading(true);
+    try {
+      const entries = Object.entries(storeSettings);
+      for (const [key, value] of entries) {
+        await fetch('/api/admin/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key, value: value || ' ', description: `Store ${key}` }),
+        });
+      }
+      setAlert({ type: 'success', message: 'Store settings saved successfully' });
+    } catch (error) {
+      setAlert({ type: 'error', message: 'Failed to save store settings' });
+    } finally {
+      setStoreLoading(false);
+    }
+  };
+
+  const handleDefaultStaffSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStaffLoading(true);
+    try {
+      await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'default_staff_id', value: defaultStaffId || '0', description: 'Default staff member ID' }),
+      });
+      setAlert({ type: 'success', message: 'Default staff saved successfully' });
+    } catch (error) {
+      setAlert({ type: 'error', message: 'Failed to save default staff' });
+    } finally {
+      setStaffLoading(false);
     }
   };
 
@@ -182,6 +262,109 @@ export default function AdminPage() {
               <div className="flex justify-end">
                 <Button type="submit" disabled={loading}>
                   {loading ? t('taxSettings.saving') : t('taxSettings.saveTaxSettings')}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </Card>
+
+        {/* Store Settings Card */}
+        <Card>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl font-semibold text-dark dark:text-white mb-2 flex items-center gap-2">
+                <IconBuilding className="h-5 w-5" />
+                {t('storeSettings.title')}
+              </h3>
+              <p className="text-bodytext text-sm mb-4">
+                {t('storeSettings.subtitle')}
+              </p>
+            </div>
+
+            <form onSubmit={handleStoreSettingsSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="storeName">{t('storeSettings.storeName')}</Label>
+                <TextInput
+                  id="storeName"
+                  value={storeSettings.store_name}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, store_name: e.target.value })}
+                  placeholder={t('storeSettings.storeNamePlaceholder')}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="storeAddress">{t('storeSettings.storeAddress')}</Label>
+                <TextInput
+                  id="storeAddress"
+                  value={storeSettings.store_address}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, store_address: e.target.value })}
+                  placeholder={t('storeSettings.storeAddressPlaceholder')}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="storePhone">{t('storeSettings.storePhone')}</Label>
+                <TextInput
+                  id="storePhone"
+                  value={storeSettings.store_phone}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, store_phone: e.target.value })}
+                  placeholder={t('storeSettings.storePhonePlaceholder')}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="storeNotes">{t('storeSettings.storeNotes')}</Label>
+                <Textarea
+                  id="storeNotes"
+                  rows={3}
+                  value={storeSettings.store_notes}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, store_notes: e.target.value })}
+                  placeholder={t('storeSettings.storeNotesPlaceholder')}
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button type="submit" disabled={storeLoading}>
+                  {storeLoading ? t('storeSettings.saving') : t('storeSettings.saveStoreSettings')}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </Card>
+
+        {/* Default Staff Card */}
+        <Card>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl font-semibold text-dark dark:text-white mb-2 flex items-center gap-2">
+                <IconUser className="h-5 w-5" />
+                {t('defaultStaff.title')}
+              </h3>
+              <p className="text-bodytext text-sm mb-4">
+                {t('defaultStaff.subtitle')}
+              </p>
+            </div>
+
+            <form onSubmit={handleDefaultStaffSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="defaultStaff">{t('defaultStaff.selectStaff')}</Label>
+                <Select
+                  id="defaultStaff"
+                  value={defaultStaffId}
+                  onChange={(e) => setDefaultStaffId(e.target.value)}
+                >
+                  <option value="">{t('defaultStaff.noDefault')}</option>
+                  {staffList.map((s) => (
+                    <option key={s.id} value={String(s.id)}>
+                      {s.name} - {s.role}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              <div className="flex justify-end">
+                <Button type="submit" disabled={staffLoading}>
+                  {staffLoading ? t('defaultStaff.saving') : t('defaultStaff.saveDefaultStaff')}
                 </Button>
               </div>
             </form>

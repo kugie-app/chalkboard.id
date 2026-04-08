@@ -39,6 +39,16 @@
       "title": "No Tables Found",
       "subtitle": "Get started by creating your first billiard table",
       "button": "Create Your First Table"
+    },
+    "stopConfirmation": {
+      "title": "Stop Session",
+      "message": "Are you sure you want to stop the session for {tableName}?",
+      "currentDuration": "Current duration",
+      "confirm": "Yes, Stop Session",
+      "cancel": "Cancel"
+    },
+    "timeExpired": {
+      "notification": "Time is up for {tableName}!"
     }
   },
   "TableCard": {
@@ -956,6 +966,39 @@
       "noteText": "Current tax rate in Indonesia is 11% (PPN). Changes will apply to new orders and sessions only.",
       "saving": "Saving...",
       "saveTaxSettings": "Save Tax Settings"
+    },
+    "storeSettings": {
+      "title": "Store Information",
+      "subtitle": "Configure your billiard hall details for receipts",
+      "storeName": "Store Name",
+      "storeNamePlaceholder": "e.g., Chalkboard Billiard",
+      "storeAddress": "Address",
+      "storeAddressPlaceholder": "e.g., Jl. Sudirman No. 123",
+      "storePhone": "Phone Number",
+      "storePhonePlaceholder": "e.g., 021-1234567",
+      "storeNotes": "Additional Notes (printed on receipt)",
+      "storeNotesPlaceholder": "e.g., WiFi Password: billiard123",
+      "saving": "Saving...",
+      "saveStoreSettings": "Save Store Settings"
+    },
+    "defaultStaff": {
+      "title": "Default Staff",
+      "subtitle": "Set a default staff member to reduce selection friction",
+      "selectStaff": "Select Default Staff",
+      "noDefault": "No default (manual selection required)",
+      "saving": "Saving...",
+      "saveDefaultStaff": "Save Default Staff"
+    },
+    "checkout": {
+      "printAndSave": "Print & Save",
+      "adjustDuration": "Adjust Duration",
+      "taxBreakdown": "Tax Breakdown",
+      "tableTax": "Table Tax",
+      "fnbTax": "F&B Tax",
+      "duration": "Duration",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds"
     }
   },
   "PricingPackages": {

@@ -1,14 +1,13 @@
 'use client';
 import React, { useState } from 'react';
 import { Button } from 'flowbite-react';
-import { IconClock, IconPlayerPause, IconEdit, IconDeviceFloppy, IconX } from '@tabler/icons-react';
+import { IconClock, IconEdit, IconDeviceFloppy, IconX } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 
 interface DurationManagementProps {
   sessionId: number;
   currentDurationType: 'hourly' | 'per_minute';
   elapsedMinutes: number;
-  onDurationTypeChange: (newType: 'hourly' | 'per_minute') => void;
   onDurationUpdate: (newDuration: number) => void;
   isUpdating?: boolean;
 }
@@ -17,7 +16,6 @@ const DurationManagement: React.FC<DurationManagementProps> = ({
   sessionId,
   currentDurationType,
   elapsedMinutes,
-  onDurationTypeChange,
   onDurationUpdate,
   isUpdating = false
 }) => {
@@ -37,11 +35,6 @@ const DurationManagement: React.FC<DurationManagementProps> = ({
     }
   };
 
-  const handleDurationTypeToggle = () => {
-    const newType = currentDurationType === 'hourly' ? 'per_minute' : 'hourly';
-    onDurationTypeChange(newType);
-  };
-
   return (
     <div className="bg-white dark:bg-darkgray border rounded-lg p-4 space-y-3">
       <div className="flex items-center justify-between">
@@ -51,16 +44,6 @@ const DurationManagement: React.FC<DurationManagementProps> = ({
             {tCommon('durationManagement')}
           </span>
         </div>
-
-        {/* Duration Type Toggle */}
-        <Button
-          size="xs"
-          color={currentDurationType === 'hourly' ? 'primary' : 'secondary'}
-          onClick={handleDurationTypeToggle}
-          disabled={isUpdating}
-        >
-          {currentDurationType === 'hourly' ? tCommon('changeToPerMinute') : tCommon('changeToHourly')}
-        </Button>
       </div>
 
       {/* Current Duration Display/Edit */}

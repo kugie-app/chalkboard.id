@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { tables, tableSessions } from '@/schema/tables';
 import { pricingPackages } from '@/schema/pricing-packages';
+import { systemSettings } from '@/schema/settings';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 
@@ -54,8 +55,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Determine duration type based on pricing package category
     const sessionDurationType = pricingPackage[0].category === 'per_minute' ? 'per_minute' : 'hourly';
 
-    // Get staff ID from session or use test default
-    const staffId = (session as any)?.staffId || (session?.user as any)?.staffId || 1;
+    // Get staff ID from session, then default staff setting, then fallback to 1
+    let staffId = (session as any)?.staffId || (session?.user as any)?.staffId;
+    if (!staffId) {
+      const defaultStaffSetting = await db.select().from(systemSettings)
+        .where(and(eq(systemSettings.key, 'default_staff_id'), eq(systemSettings.isActive, true)))
+        .limit(1);
+      const defaultId = defaultStaffSetting[0]?.value;
+      staffId = (defaultId && defaultId !== '0') ? parseInt(defaultId) : 1;
+    }
     
     // Start new session
     const newSession = await db.insert(tableSessions).values({

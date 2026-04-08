@@ -95,7 +95,11 @@ const ChalkBoardDashboard = () => {
       const response = await fetch('/api/tables');
       if (response.ok) {
         const data = await response.json();
-        const sortedTables = data.sort((a: Table, b: Table) => a.id - b.id);
+        const sortedTables = data.sort((a: Table, b: Table) => {
+          const numA = parseInt((a.name.match(/(\d+)/) || ['0', '0'])[1], 10);
+          const numB = parseInt((b.name.match(/(\d+)/) || ['0', '0'])[1], 10);
+          return numA - numB || a.name.localeCompare(b.name);
+        });
         setTables(sortedTables);
         
         // Calculate stats

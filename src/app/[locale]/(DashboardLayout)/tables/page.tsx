@@ -200,6 +200,8 @@ const TablesManagement = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const autoEndTriggeredRef = useRef<Set<number>>(new Set());
   const [pricingPackages, setPricingPackages] = useState<PricingPackage[]>([]);
+  const [showStopConfirmModal, setShowStopConfirmModal] = useState(false);
+  const [tableToStop, setTableToStop] = useState<BilliardTable | null>(null);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -214,7 +216,11 @@ const TablesManagement = () => {
       const response = await fetch('/api/tables');
       if (response.ok) {
         const data = await response.json();
-        const sortedTables = data.sort((a: BilliardTable, b: BilliardTable) => a.id - b.id);
+        const sortedTables = data.sort((a: BilliardTable, b: BilliardTable) => {
+          const numA = parseInt((a.name.match(/(\d+)/) || ['0', '0'])[1], 10);
+          const numB = parseInt((b.name.match(/(\d+)/) || ['0', '0'])[1], 10);
+          return numA - numB || a.name.localeCompare(b.name);
+        });
         setTables(sortedTables);
         
         // Fetch current sessions for occupied tables
@@ -315,8 +321,24 @@ const TablesManagement = () => {
       fetchTables();
       fetchTaxSettings();
       fetchPricingPackages();
+      fetchDefaultStaff();
     }
   }, [session]);
+
+  const fetchDefaultStaff = async () => {
+    try {
+      const response = await fetch('/api/admin/settings');
+      if (response.ok) {
+        const data = await response.json();
+        const defaultId = data.settings?.default_staff_id;
+        if (defaultId && defaultId !== '0') {
+          setSelectedStaffId(defaultId);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch default staff:', error);
+    }
+  };
 
   const fetchTaxSettings = async () => {
     try {
@@ -339,18 +361,17 @@ const TablesManagement = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Auto end planned sessions when time is up
+  // Show notification when planned sessions expire (no auto-stop)
   useEffect(() => {
     tables.forEach((table) => {
-      const session = sessions[table.id];
-      if (!session) return;
-      if ((session.plannedDuration || 0) <= 0) return; // open mode
-      const elapsed = calculateElapsedTime(session.startTime);
-      const remaining = session.plannedDuration * 60 - elapsed;
+      const tableSession = sessions[table.id];
+      if (!tableSession) return;
+      if ((tableSession.plannedDuration || 0) <= 0) return; // open mode
+      const elapsed = calculateElapsedTime(tableSession.startTime);
+      const remaining = tableSession.plannedDuration * 60 - elapsed;
       if (remaining <= 0 && !autoEndTriggeredRef.current.has(table.id)) {
         autoEndTriggeredRef.current.add(table.id);
-        // Fire and forget; UI will refresh via fetchTables in handler
-        handleEndSession(table.id);
+        showAlert('error', t('timeExpired.notification', { tableName: table.name }));
       }
     });
   }, [currentTime, sessions, tables]);
@@ -752,11 +773,168 @@ const TablesManagement = () => {
     fetchTables();
   };
 
-  const handleBillingConfirm = (finalBillingData: any) => {
-    // Process payment with final billing data
-    showAlert('success', tAlerts('paymentProcessedSuccess'));
-    setShowBillingModal(false);
-    setBillingData(null);
+  const handleBillingConfirm = async (finalBillingData: any) => {
+    try {
+      const billing = finalBillingData.billing;
+      const response = await fetch('/api/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: billing.sessionId || finalBillingData.session.id,
+          tableId: billing.tableId,
+          customerName: billing.customerName || finalBillingData.session.customerName,
+          customerPhone: billing.customerPhone || finalBillingData.session.customerPhone,
+          tableAmount: billing.tableCost,
+          fnbAmount: billing.fnbTotalCost,
+          taxAmount: billing.totalTaxAmount || 0,
+          totalAmount: billing.totalCost,
+          staffId: billing.staffId,
+          paymentMethods: [{ type: 'cash', amount: billing.totalCost }],
+        }),
+      });
+
+      if (response.ok) {
+        const paymentData = await response.json();
+        // Print receipt
+        printCheckoutReceipt(paymentData, finalBillingData);
+        showAlert('success', tAlerts('paymentProcessedSuccess'));
+        setShowBillingModal(false);
+        setBillingData(null);
+        fetchTables();
+      } else {
+        const error = await response.json();
+        showAlert('error', error.error || 'Failed to process payment');
+      }
+    } catch (error) {
+      showAlert('error', 'Failed to process payment');
+    }
+  };
+
+  const printCheckoutReceipt = (paymentData: any, billingData: any) => {
+    const billing = billingData.billing;
+    const session = billingData.session;
+
+    const formatCurrencyReceipt = (amount: number) =>
+      new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+
+    // Fetch store settings for receipt
+    fetch('/api/admin/settings')
+      .then(res => res.json())
+      .then(data => {
+        const s = data.settings || {};
+        const storeName = (s.store_name || 'CHALKBOARD BILLIARD').trim();
+        const storeAddress = (s.store_address || '').trim();
+        const storePhone = (s.store_phone || '').trim();
+        const storeNotes = (s.store_notes || '').trim();
+
+        const fnbSection = billing.fnbOrders && billing.fnbOrders.length > 0
+          ? `<div class="section">
+              <h3>F&B ORDERS</h3>
+              ${billing.fnbOrders.map((order: any) =>
+                `<div class="item-row">
+                  <span class="item-name">${order.orderNumber}</span>
+                  <span class="item-price">${formatCurrencyReceipt(parseFloat(order.total))}</span>
+                </div>`
+              ).join('')}
+            </div>`
+          : '';
+
+        const taxSection = billing.totalTaxAmount > 0
+          ? `<div class="subtotal-row">
+              <span>${billing.taxSettings?.name || 'Tax'} (${billing.taxSettings?.percentage || 0}%):</span>
+              <span>${formatCurrencyReceipt(billing.totalTaxAmount)}</span>
+            </div>`
+          : '';
+
+        const receiptHtml = `
+          <!DOCTYPE html>
+          <html><head>
+            <meta charset="UTF-8">
+            <title>Receipt - ${paymentData.transactionNumber}</title>
+            <style>
+              body { font-family: 'Courier New', monospace; max-width: 300px; margin: 0 auto; padding: 10px; font-size: 12px; line-height: 1.4; }
+              .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+              .header h1 { margin: 0; font-size: 16px; font-weight: bold; }
+              .header p { margin: 2px 0; font-size: 10px; }
+              .section { margin: 10px 0; border-bottom: 1px dashed #000; padding-bottom: 8px; }
+              .item-row { display: flex; justify-content: space-between; margin: 2px 0; }
+              .item-name { flex: 1; margin-right: 10px; }
+              .item-price { text-align: right; min-width: 60px; }
+              .subtotal-row { display: flex; justify-content: space-between; margin: 2px 0; }
+              .total-row { display: flex; justify-content: space-between; font-weight: bold; margin: 5px 0 2px 0; border-top: 1px solid #000; padding-top: 3px; }
+              .footer { text-align: center; margin-top: 15px; font-size: 10px; border-top: 2px dashed #000; padding-top: 10px; }
+              @media print { body { margin: 0; padding: 5px; } }
+            </style>
+          </head><body>
+            <div class="header">
+              <h1>${storeName.toUpperCase()}</h1>
+              ${storeAddress ? `<p>${storeAddress}</p>` : ''}
+              ${storePhone ? `<p>${storePhone}</p>` : ''}
+              <p>Struk Pembayaran</p>
+              <p style="font-size:13px; font-weight:bold; margin-top:4px">${paymentData.transactionNumber}</p>
+              <p>${new Date().toLocaleString('id-ID')}</p>
+            </div>
+
+            <div class="section">
+              <p><strong>Customer:</strong> ${session.customerName}</p>
+              ${session.customerPhone ? `<p><strong>Phone:</strong> ${session.customerPhone}</p>` : ''}
+            </div>
+
+            <div class="section">
+              <h3>TABLE SESSION</h3>
+              <div class="item-row">
+                <span class="item-name">
+                  Duration: ${billing.actualDuration} min
+                  (${billing.billingDetails.type === 'hourly'
+                    ? billing.billingDetails.billableHours + ' hr'
+                    : billing.billingDetails.billableMinutes + ' min'})
+                </span>
+                <span class="item-price">${formatCurrencyReceipt(billing.tableCost)}</span>
+              </div>
+            </div>
+
+            ${fnbSection}
+
+            <div class="section">
+              <h3>PAYMENT SUMMARY</h3>
+              <div class="subtotal-row">
+                <span>Table:</span>
+                <span>${formatCurrencyReceipt(billing.tableCost)}</span>
+              </div>
+              ${billing.fnbTotalCost > 0 ? `
+                <div class="subtotal-row">
+                  <span>F&B:</span>
+                  <span>${formatCurrencyReceipt(billing.fnbTotalCost)}</span>
+                </div>
+              ` : ''}
+              ${taxSection}
+              <div class="total-row">
+                <span>TOTAL:</span>
+                <span>${formatCurrencyReceipt(billing.totalCost)}</span>
+              </div>
+            </div>
+
+            <div class="footer">
+              <p>Terima kasih atas kunjungan Anda!</p>
+              ${storeNotes ? `<p style="margin-top:4px">${storeNotes}</p>` : ''}
+              <p>${storeName}</p>
+            </div>
+          </body></html>
+        `;
+
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        if (printWindow) {
+          printWindow.document.write(receiptHtml);
+          printWindow.document.close();
+          printWindow.focus();
+          printWindow.print();
+          printWindow.close();
+        }
+      })
+      .catch(() => {
+        // Silently fail on receipt — payment was already saved
+        console.error('Failed to print receipt');
+      });
   };
 
   const getStatusColor = (status: string) => {
@@ -1131,7 +1309,7 @@ const TablesManagement = () => {
                         color="error"
                         size="xs"
                         className="flex-1"
-                        onClick={() => handleEndSession(table.id)}
+                        onClick={() => { setTableToStop(table); setShowStopConfirmModal(true); }}
                       >
                         <IconPlayerStop className="w-3 h-3 mr-1" />
                         {tCards('stopButton')}
@@ -1755,7 +1933,6 @@ const TablesManagement = () => {
               sessionId={selectedSession.id}
               currentDurationType={(selectedSession as any).durationType || 'hourly'}
               elapsedMinutes={calculateElapsedTime(selectedSession.startTime) / 60}
-              onDurationTypeChange={(newType) => handleDurationTypeChange(selectedSession.id, newType)}
               onDurationUpdate={(newDuration) => handleDurationUpdate(selectedSession.id, newDuration)}
             />
           )}
@@ -1763,6 +1940,48 @@ const TablesManagement = () => {
         <Modal.Footer>
           <Button color="secondary" onClick={() => setShowDurationModal(false)}>
             {tCommon('close')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Stop Session Confirmation Modal */}
+      <Modal show={showStopConfirmModal} onClose={() => setShowStopConfirmModal(false)} size="md">
+        <Modal.Header>{t('stopConfirmation.title')}</Modal.Header>
+        <Modal.Body>
+          <div className="space-y-4">
+            <p className="text-dark dark:text-white">
+              {t('stopConfirmation.message', { tableName: tableToStop?.name || '' })}
+            </p>
+            {tableToStop && sessions[tableToStop.id] && (
+              <div className="bg-lightgray dark:bg-darkgray p-3 rounded-lg">
+                <p className="text-sm text-bodytext">
+                  {t('stopConfirmation.currentDuration')}:{' '}
+                  <span className="font-medium text-dark dark:text-white">
+                    {Math.floor(calculateElapsedTime(sessions[tableToStop.id].startTime) / 60)} {tCommon('minutes')}
+                  </span>
+                </p>
+              </div>
+            )}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            color="error"
+            onClick={() => {
+              if (tableToStop) {
+                handleEndSession(tableToStop.id);
+              }
+              setShowStopConfirmModal(false);
+              setTableToStop(null);
+            }}
+          >
+            {t('stopConfirmation.confirm')}
+          </Button>
+          <Button
+            color="secondary"
+            onClick={() => { setShowStopConfirmModal(false); setTableToStop(null); }}
+          >
+            {t('stopConfirmation.cancel')}
           </Button>
         </Modal.Footer>
       </Modal>

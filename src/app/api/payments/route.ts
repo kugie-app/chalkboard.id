@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { payments } from '@/schema/payments';
 import { tableSessions, tables } from '@/schema/tables';
 import { fnbOrders, fnbOrderItems, fnbItems, fnbCategories, staff } from '@/schema/fnb';
-import { eq, sql } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
@@ -226,6 +226,17 @@ export async function POST(request: NextRequest) {
       await db.update(fnbOrders)
         .set({ paymentId })
         .where(eq(fnbOrders.id, parseInt(orderId)));
+    }
+
+    // Link pending FnB orders for this table to the payment (checkout flow)
+    const tableId = body.tableId;
+    if (tableId) {
+      await db.update(fnbOrders)
+        .set({ paymentId, status: 'billed' })
+        .where(and(
+          eq(fnbOrders.tableId, parseInt(String(tableId))),
+          eq(fnbOrders.status, 'pending')
+        ));
     }
 
     return NextResponse.json({

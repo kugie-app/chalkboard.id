@@ -1,8 +1,16 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Select, Label, TextInput } from 'flowbite-react';
-import { IconEdit, IconDeviceFloppy, IconX, IconClock, IconCurrencyDollar, IconLoader2 } from '@tabler/icons-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Modal, Button, Label, TextInput } from 'flowbite-react';
+import { IconPrinter, IconCurrencyDollar, IconClock, IconLoader2 } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
+
+interface TaxSettings {
+  enabled: boolean;
+  percentage: number;
+  name: string;
+  applyToTables: boolean;
+  applyToFnb: boolean;
+}
 
 interface BillingData {
   session: {
@@ -13,6 +21,11 @@ interface BillingData {
     endTime: string;
   };
   billing: {
+    sessionId: number;
+    tableId: number;
+    customerName: string;
+    customerPhone?: string;
+    staffId?: number;
     actualDuration: number;
     originalDuration: number;
     calculatedDuration: number;
@@ -22,11 +35,17 @@ interface BillingData {
       actualMinutes: number;
       billableHours?: number;
       billableMinutes?: number;
+      packageName?: string;
     };
     tableCost: number;
     fnbTotalCost: number;
+    subtotal: number;
+    tableTax: number;
+    fnbTax: number;
+    totalTaxAmount: number;
     totalCost: number;
     fnbOrders: any[];
+    taxSettings: TaxSettings;
   };
 }
 
@@ -37,6 +56,27 @@ interface EnhancedBillingModalProps {
   onConfirmPayment: (finalBillingData: BillingData) => void;
 }
 
+// Helper: convert minutes (decimal) to HH:mm:ss
+function minutesToHMS(totalMinutes: number): { hours: string; minutes: string; seconds: string } {
+  const totalSeconds = Math.round(totalMinutes * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return {
+    hours: String(h).padStart(2, '0'),
+    minutes: String(m).padStart(2, '0'),
+    seconds: String(s).padStart(2, '0'),
+  };
+}
+
+// Helper: convert HH:mm:ss to total minutes
+function hmsToMinutes(hours: string, minutes: string, seconds: string): number {
+  const h = parseInt(hours) || 0;
+  const m = parseInt(minutes) || 0;
+  const s = parseInt(seconds) || 0;
+  return h * 60 + m + s / 60;
+}
+
 const EnhancedBillingModal: React.FC<EnhancedBillingModalProps> = ({
   show,
   onClose,
@@ -44,22 +84,89 @@ const EnhancedBillingModal: React.FC<EnhancedBillingModalProps> = ({
   onConfirmPayment
 }) => {
   const tCommon = useTranslations('Common');
-  const [isEditingDuration, setIsEditingDuration] = useState(false);
-  const [editedDuration, setEditedDuration] = useState(0);
-  const [editedDurationType, setEditedDurationType] = useState<'hourly' | 'per_minute'>('hourly');
+  const tCheckout = useTranslations('AdminPage.checkout');
+  const [hours, setHours] = useState('00');
+  const [mins, setMins] = useState('00');
+  const [secs, setSecs] = useState('00');
   const [recalculatedBilling, setRecalculatedBilling] = useState<BillingData | null>(null);
   const [isRecalculating, setIsRecalculating] = useState(false);
   const [recalculationError, setRecalculationError] = useState<string | null>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (billingData) {
-      setEditedDuration(billingData.billing.actualDuration);
-      setEditedDurationType(billingData.billing.billingDetails.type);
+      const hms = minutesToHMS(billingData.billing.actualDuration);
+      setHours(hms.hours);
+      setMins(hms.minutes);
+      setSecs(hms.seconds);
       setRecalculatedBilling(null);
-      setIsEditingDuration(false);
       setRecalculationError(null);
     }
   }, [billingData]);
+
+  const handleRecalculate = useCallback(async (h: string, m: string, s: string) => {
+    if (!billingData) return;
+
+    const newMinutes = hmsToMinutes(h, m, s);
+    if (newMinutes <= 0) return;
+
+    // Skip if duration hasn't changed
+    if (Math.abs(newMinutes - billingData.billing.actualDuration) < 0.01 && !recalculatedBilling) return;
+
+    setIsRecalculating(true);
+    setRecalculationError(null);
+
+    try {
+      const response = await fetch(`/api/table-sessions/${billingData.session.id}/recalculate-billing`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actualDuration: Math.round(newMinutes) }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setRecalculatedBilling({
+          session: billingData.session,
+          billing: {
+            ...billingData.billing,
+            ...data.billing,
+          }
+        });
+      } else {
+        const error = await response.json();
+        setRecalculationError(error.message || tCommon('failedToRecalculateBilling'));
+      }
+    } catch {
+      setRecalculationError(tCommon('errorRecalculatingBilling'));
+    } finally {
+      setIsRecalculating(false);
+    }
+  }, [billingData, recalculatedBilling, tCommon]);
+
+  // Debounced recalculation on time input change
+  const scheduleRecalculate = useCallback((h: string, m: string, s: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => handleRecalculate(h, m, s), 500);
+  }, [handleRecalculate]);
+
+  const handleTimeChange = (field: 'hours' | 'minutes' | 'seconds', value: string) => {
+    // Allow only numeric input, clamp values
+    const num = value.replace(/\D/g, '').slice(0, 2);
+    let newH = hours, newM = mins, newS = secs;
+    if (field === 'hours') { newH = num; setHours(num); }
+    if (field === 'minutes') { newM = num; setMins(num); }
+    if (field === 'seconds') { newS = num; setSecs(num); }
+    scheduleRecalculate(newH, newM, newS);
+  };
+
+  const handleConfirmPayment = () => {
+    const finalData = recalculatedBilling || billingData;
+    if (finalData) {
+      onConfirmPayment(finalData);
+    }
+  };
+
+  const currentBilling = recalculatedBilling || billingData;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -67,19 +174,6 @@ const EnhancedBillingModal: React.FC<EnhancedBillingModalProps> = ({
       currency: 'IDR',
       minimumFractionDigits: 0,
     }).format(amount);
-  };
-
-  const formatTime = (totalMinutes: number) => {
-    const currentDurationType = billingData?.billing.billingDetails.type;
-    if (currentDurationType === 'hourly') {
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = Math.round(totalMinutes % 60);
-      return `${hours} ${tCommon('hours')} ${minutes} ${tCommon('minutes')}`;
-    } else {
-      const minutes = Math.floor(totalMinutes);
-      const seconds = Math.round((totalMinutes - minutes) * 60);
-      return `${minutes} ${tCommon('min')} ${seconds} ${tCommon('sec')}`;
-    }
   };
 
   const formatDateTime = (dateString: string) => {
@@ -93,59 +187,10 @@ const EnhancedBillingModal: React.FC<EnhancedBillingModalProps> = ({
     });
   };
 
-  const handleRecalculateBilling = async () => {
-    if (!billingData) return;
-
-    setIsRecalculating(true);
-    setRecalculationError(null);
-
-    try {
-      const response = await fetch(`/api/table-sessions/${billingData.session.id}/recalculate-billing`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actualDuration: editedDuration,
-          durationType: editedDurationType
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setRecalculatedBilling({
-          session: billingData.session,
-          billing: data.billing
-        });
-        setIsEditingDuration(false);
-      } else {
-        const error = await response.json();
-        setRecalculationError(error.message || tCommon('failedToRecalculateBilling'));
-      }
-    } catch (error) {
-      setRecalculationError(tCommon('errorRecalculatingBilling'));
-    } finally {
-      setIsRecalculating(false);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    if (billingData) {
-      setEditedDuration(billingData.billing.actualDuration);
-      setEditedDurationType(billingData.billing.billingDetails.type);
-    }
-    setIsEditingDuration(false);
-    setRecalculationError(null);
-  };
-
-  const handleConfirmPayment = () => {
-    const finalData = recalculatedBilling || billingData;
-    if (finalData) {
-      onConfirmPayment(finalData);
-    }
-  };
-
-  const currentBilling = recalculatedBilling || billingData;
-
   if (!billingData) return null;
+
+  const taxSettings = currentBilling?.billing.taxSettings;
+  const showTax = taxSettings?.enabled && (currentBilling?.billing.totalTaxAmount || 0) > 0;
 
   return (
     <Modal show={show} onClose={onClose} size="lg">
@@ -181,111 +226,74 @@ const EnhancedBillingModal: React.FC<EnhancedBillingModalProps> = ({
                   {formatDateTime(billingData.session.endTime)}
                 </span>
               </div>
+              <div>
+                <span className="text-bodytext">{tCommon('billingType')}:</span>
+                <span className="ml-2 font-medium text-dark dark:text-white">
+                  {currentBilling?.billing.billingDetails.type === 'hourly' ? tCommon('hourlyRate') : tCommon('perMinuteRate')}
+                  {currentBilling?.billing.billingDetails.packageName && (
+                    <span className="text-xs text-bodytext ml-1">({currentBilling.billing.billingDetails.packageName})</span>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Duration Management */}
+          {/* Duration Input — HH:mm:ss */}
           <div className="border-b pb-4">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 mb-3">
+              <IconClock className="w-5 h-5 text-primary" />
               <h3 className="text-lg font-semibold text-dark dark:text-white">
-                {tCommon('durationAndBillingType')}
+                {tCheckout('adjustDuration')}
               </h3>
-              {!isEditingDuration && (
-                <Button
-                  size="xs"
-                  color="secondary"
-                  onClick={() => setIsEditingDuration(true)}
-                >
-                  <IconEdit className="w-3 h-3 mr-1" />
-                  Edit Duration
-                </Button>
-              )}
+              {isRecalculating && <IconLoader2 className="w-4 h-4 animate-spin text-primary" />}
             </div>
 
-            {isEditingDuration ? (
-              <div className="space-y-4 bg-lightinfo p-4 rounded-lg">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="editDuration" value={tCommon('durationMinutes')} />
-                    <TextInput
-                      id="editDuration"
-                      type="number"
-                      value={editedDuration}
-                      onChange={(e) => setEditedDuration(parseInt(e.target.value) || 0)}
-                      min="1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="durationType" value={tCommon('billingType')} />
-                    <Select
-                      id="durationType"
-                      value={editedDurationType}
-                      onChange={(e) => setEditedDurationType(e.target.value as 'hourly' | 'per_minute')}
-                    >
-                      <option value="hourly">{tCommon('hourlyRate')}</option>
-                      <option value="per_minute">{tCommon('perMinuteRate')}</option>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    size="xs"
-                    color="primary"
-                    onClick={handleRecalculateBilling}
-                    disabled={isRecalculating}
-                  >
-                    {isRecalculating ? (
-                      <>
-                        <IconLoader2 className="w-3 h-3 mr-1 animate-spin" />
-                        Recalculating...
-                      </>
-                    ) : (
-                      <>
-                        <IconDeviceFloppy className="w-3 h-3 mr-1" />
-                        Recalculate
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    size="xs"
-                    color="secondary"
-                    onClick={handleCancelEdit}
-                    disabled={isRecalculating}
-                  >
-                    <IconX className="w-3 h-3 mr-1" />
-                    Cancel
-                  </Button>
-                </div>
-
-                {recalculationError && (
-                  <div className="text-error text-sm">
-                    {recalculationError}
-                  </div>
-                )}
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <Label htmlFor="durationHours" className="text-xs text-bodytext">{tCheckout('hours')}</Label>
+                <TextInput
+                  id="durationHours"
+                  value={hours}
+                  onChange={(e) => handleTimeChange('hours', e.target.value)}
+                  className="text-center font-mono text-lg"
+                  sizing="lg"
+                />
               </div>
-            ) : (
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-bodytext">Duration:</span>
-                  <div className="font-medium text-dark dark:text-white">
-                    {formatTime(currentBilling?.billing.actualDuration || 0)}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-bodytext">{tCommon('billingType')}:</span>
-                  <div className="font-medium text-dark dark:text-white">
-                    {currentBilling?.billing.billingDetails.type === 'hourly' ? tCommon('hourlyRate') : tCommon('perMinuteRate')}
-                  </div>
-                </div>
+              <span className="text-2xl font-bold text-dark dark:text-white mt-4">:</span>
+              <div className="flex-1">
+                <Label htmlFor="durationMins" className="text-xs text-bodytext">{tCheckout('minutes')}</Label>
+                <TextInput
+                  id="durationMins"
+                  value={mins}
+                  onChange={(e) => handleTimeChange('minutes', e.target.value)}
+                  className="text-center font-mono text-lg"
+                  sizing="lg"
+                />
+              </div>
+              <span className="text-2xl font-bold text-dark dark:text-white mt-4">:</span>
+              <div className="flex-1">
+                <Label htmlFor="durationSecs" className="text-xs text-bodytext">{tCheckout('seconds')}</Label>
+                <TextInput
+                  id="durationSecs"
+                  value={secs}
+                  onChange={(e) => handleTimeChange('seconds', e.target.value)}
+                  className="text-center font-mono text-lg"
+                  sizing="lg"
+                />
+              </div>
+            </div>
+
+            {recalculatedBilling && (
+              <div className="mt-3 p-2 bg-lightsuccess rounded-lg">
+                <p className="text-success text-sm font-medium">
+                  ✓ Billing recalculated
+                </p>
               </div>
             )}
 
-            {recalculatedBilling && (
-              <div className="mt-3 p-3 bg-lightsuccess rounded-lg">
-                <p className="text-success text-sm font-medium">
-                  ✓ Billing has been recalculated with new duration and billing type
-                </p>
+            {recalculationError && (
+              <div className="mt-3 text-error text-sm">
+                {recalculationError}
               </div>
             )}
           </div>
@@ -320,6 +328,36 @@ const EnhancedBillingModal: React.FC<EnhancedBillingModalProps> = ({
                   {formatCurrency(currentBilling?.billing.fnbTotalCost || 0)}
                 </span>
               </div>
+
+              {/* Tax Breakdown */}
+              {showTax && (
+                <>
+                  <div className="border-t pt-2 mt-2">
+                    <div className="flex justify-between text-xs text-bodytext mb-1">
+                      <span>{tCheckout('taxBreakdown')} ({taxSettings?.name} {taxSettings?.percentage}%)</span>
+                    </div>
+                    {(currentBilling?.billing.tableTax || 0) > 0 && (
+                      <div className="flex justify-between text-xs text-bodytext">
+                        <span>  {tCheckout('tableTax')}:</span>
+                        <span>{formatCurrency(currentBilling?.billing.tableTax || 0)}</span>
+                      </div>
+                    )}
+                    {(currentBilling?.billing.fnbTax || 0) > 0 && (
+                      <div className="flex justify-between text-xs text-bodytext">
+                        <span>  {tCheckout('fnbTax')}:</span>
+                        <span>{formatCurrency(currentBilling?.billing.fnbTax || 0)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-bodytext">{taxSettings?.name}:</span>
+                      <span className="font-medium text-dark dark:text-white">
+                        {formatCurrency(currentBilling?.billing.totalTaxAmount || 0)}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div className="flex justify-between text-lg font-semibold border-t pt-2">
                 <span className="text-dark dark:text-white">Total Cost:</span>
                 <span className="text-primary">
@@ -348,16 +386,16 @@ const EnhancedBillingModal: React.FC<EnhancedBillingModalProps> = ({
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button 
-          color="primary" 
+        <Button
+          color="primary"
           onClick={handleConfirmPayment}
           disabled={isRecalculating}
         >
-          <IconCurrencyDollar className="w-4 h-4 mr-2" />
-          Confirm & Process Payment
+          <IconPrinter className="w-4 h-4 mr-2" />
+          {tCheckout('printAndSave')}
         </Button>
-        <Button 
-          color="secondary" 
+        <Button
+          color="secondary"
           onClick={onClose}
           disabled={isRecalculating}
         >

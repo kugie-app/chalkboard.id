@@ -3,14 +3,13 @@ import { db } from '@/lib/db';
 import { tables, tableSessions } from '@/schema/tables';
 import { pricingPackages } from '@/schema/pricing-packages';
 import { fnbOrders } from '@/schema/fnb';
-import { payments } from '@/schema/payments';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { getTaxSettings } from '@/lib/tax-server';
 import { calculateTax } from '@/lib/tax';
 
 export async function POST(
-  request: NextRequest, 
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -35,7 +34,7 @@ export async function POST(
     const endTime = new Date();
     const startTime = new Date(currentSession.startTime);
     const calculatedDuration = Math.floor((endTime.getTime() - startTime.getTime()) / (1000 * 60)); // in minutes
-    
+
     // Use actual duration if manually set, otherwise use calculated duration
     const actualDuration = currentSession.actualDuration || calculatedDuration;
     const originalDuration = currentSession.originalDuration || calculatedDuration;
@@ -48,19 +47,19 @@ export async function POST(
         .limit(1);
       pricingPackage = packageResult[0];
     }
-    
+
     // Fallback to table rates if no package found (backwards compatibility)
     const table = await db.select().from(tables).where(eq(tables.id, tableId)).limit(1);
     const tableData = table[0];
-    
-    // Determine billing type based on package, session preference, or table configuration
+
+    // Determine billing type based on package (locked to package)
     let billingRateType: string;
     if (pricingPackage) {
       billingRateType = pricingPackage.category;
     } else {
       billingRateType = currentSession.durationType || (tableData.perMinuteRate ? 'per_minute' : 'hourly');
     }
-    
+
     let tableCost: number;
     let billingDetails: any;
 
@@ -72,15 +71,15 @@ export async function POST(
       } else {
         perMinuteRate = table[0].perMinuteRate ? parseFloat(table[0].perMinuteRate) : parseFloat(table[0].hourlyRate) / 60;
       }
-      
+
       const seconds = (endTime.getTime() - startTime.getTime()) / 1000;
       const minutes = Math.floor(seconds / 60);
       const remainingSeconds = seconds % 60;
-      
+
       // Round up if more than 30 seconds
       const billableMinutes = remainingSeconds > 30 ? minutes + 1 : minutes;
       tableCost = billableMinutes * perMinuteRate;
-      
+
       billingDetails = {
         type: 'per_minute',
         rate: perMinuteRate,
@@ -97,10 +96,10 @@ export async function POST(
       } else {
         hourlyRate = parseFloat(table[0].hourlyRate);
       }
-      
+
       const billableHours = Math.ceil(actualDuration / 60);
       tableCost = billableHours * hourlyRate;
-      
+
       billingDetails = {
         type: 'hourly',
         rate: hourlyRate,
@@ -109,33 +108,33 @@ export async function POST(
         packageName: pricingPackage?.name
       };
     }
-    
+
     // Get F&B orders for this table during the session
     const fnbOrdersForTable = await db.select().from(fnbOrders)
       .where(and(
         eq(fnbOrders.tableId, tableId),
         eq(fnbOrders.status, 'pending')
       ));
-    
+
     // Calculate total F&B cost
     const fnbTotalCost = fnbOrdersForTable.reduce((total, order) => {
       return total + parseFloat(order.total);
     }, 0);
-    
+
     // Get tax settings and calculate tax
     const taxSettings = await getTaxSettings();
-    
+
     // Calculate tax separately for table and F&B amounts
     const tableTax = calculateTax(tableCost, taxSettings, true); // isTable = true
     const fnbTax = calculateTax(fnbTotalCost, taxSettings, false); // isTable = false
     const totalTaxAmount = tableTax + fnbTax;
-    
+
     // Total cost before tax
     const subtotal = tableCost + fnbTotalCost;
     // Total cost including tax
     const totalCost = subtotal + totalTaxAmount;
 
-    // End the session
+    // End the session (mark as completed)
     const endedSession = await db.update(tableSessions)
       .set({
         endTime,
@@ -147,60 +146,20 @@ export async function POST(
       .where(eq(tableSessions.id, currentSession.id))
       .returning();
 
-    // Create payment record for the total amount
-    const transactionId = `TXN-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    
-    const newPayment = await db.insert(payments).values({
-      transactionNumber: transactionId,
-      customerName: currentSession.customerName,
-      customerPhone: currentSession.customerPhone,
-      totalAmount: totalCost.toFixed(2),
-      paymentMethods: JSON.stringify([{ type: 'cash', amount: totalCost.toFixed(2) }]),
-      staffId: currentSession.staffId,
-      status: 'pending',
-      tableAmount: tableCost.toFixed(2),
-      fnbAmount: fnbTotalCost.toFixed(2),
-      discountAmount: '0',
-      taxAmount: totalTaxAmount.toFixed(2),
-      // Legacy fields for compatibility
-      transactionId,
-      midtransOrderId: `ORDER-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-      amount: totalCost.toFixed(2),
-      currency: 'IDR',
-      paymentMethod: 'cash',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }).returning();
-
-    const paymentId = newPayment[0].id;
-
-    // Link the table session to the payment
-    await db.update(tableSessions)
-      .set({ paymentId })
-      .where(eq(tableSessions.id, currentSession.id));
-
-    // Link all F&B orders for this table to the payment
-    if (fnbOrdersForTable.length > 0) {
-      await db.update(fnbOrders)
-        .set({ 
-          paymentId,
-          status: 'billed' // Update status to indicate it's now part of a bill
-        })
-        .where(and(
-          eq(fnbOrders.tableId, tableId),
-          eq(fnbOrders.status, 'pending')
-        ));
-    }
-
     // Update table status to available
     await db.update(tables)
       .set({ status: 'available', updatedAt: new Date() })
       .where(eq(tables.id, tableId));
 
+    // Return billing preview data (payment is NOT created yet — deferred to checkout confirmation)
     return NextResponse.json({
       session: endedSession[0],
-      payment: newPayment[0],
       billing: {
+        sessionId: currentSession.id,
+        tableId,
+        customerName: currentSession.customerName,
+        customerPhone: currentSession.customerPhone,
+        staffId: currentSession.staffId,
         actualDuration,
         originalDuration,
         calculatedDuration,
@@ -219,4 +178,4 @@ export async function POST(
   } catch (error) {
     return NextResponse.json({ error: 'Failed to end session' }, { status: 500 });
   }
-} 
+}

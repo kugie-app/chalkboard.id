@@ -39,6 +39,16 @@
       "title": "Tidak Ada Meja Ditemukan",
       "subtitle": "Mulailah dengan membuat meja biliar pertama Anda",
       "button": "Buat Meja Pertama Anda"
+    },
+    "stopConfirmation": {
+      "title": "Hentikan Sesi",
+      "message": "Apakah Anda yakin ingin menghentikan sesi untuk {tableName}?",
+      "currentDuration": "Durasi saat ini",
+      "confirm": "Ya, Hentikan Sesi",
+      "cancel": "Batal"
+    },
+    "timeExpired": {
+      "notification": "Waktu habis untuk {tableName}!"
     }
   },
   "TableCard": {
@@ -957,6 +967,39 @@
       "noteText": "Tarif pajak saat ini di Indonesia adalah 11% (PPN). Perubahan akan berlaku untuk pesanan dan sesi baru saja.",
       "saving": "Menyimpan...",
       "saveTaxSettings": "Simpan Pengaturan Pajak"
+    },
+    "storeSettings": {
+      "title": "Informasi Toko",
+      "subtitle": "Konfigurasi detail billiard hall untuk struk",
+      "storeName": "Nama Toko",
+      "storeNamePlaceholder": "contoh: Chalkboard Billiard",
+      "storeAddress": "Alamat",
+      "storeAddressPlaceholder": "contoh: Jl. Sudirman No. 123",
+      "storePhone": "Nomor Telepon",
+      "storePhonePlaceholder": "contoh: 021-1234567",
+      "storeNotes": "Catatan Tambahan (dicetak pada struk)",
+      "storeNotesPlaceholder": "contoh: Password WiFi: billiard123",
+      "saving": "Menyimpan...",
+      "saveStoreSettings": "Simpan Pengaturan Toko"
+    },
+    "defaultStaff": {
+      "title": "Staff Default",
+      "subtitle": "Atur staff default untuk mengurangi proses seleksi",
+      "selectStaff": "Pilih Staff Default",
+      "noDefault": "Tidak ada default (pilih manual)",
+      "saving": "Menyimpan...",
+      "saveDefaultStaff": "Simpan Staff Default"
+    },
+    "checkout": {
+      "printAndSave": "Cetak & Simpan",
+      "adjustDuration": "Sesuaikan Durasi",
+      "taxBreakdown": "Rincian Pajak",
+      "tableTax": "Pajak Meja",
+      "fnbTax": "Pajak F&B",
+      "duration": "Durasi",
+      "hours": "Jam",
+      "minutes": "Menit",
+      "seconds": "Detik"
     }
   },
   "PricingPackages": {

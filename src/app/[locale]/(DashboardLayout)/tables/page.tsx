@@ -200,6 +200,7 @@ const TablesManagement = () => {
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const autoEndTriggeredRef = useRef<Set<number>>(new Set());
+  const defaultStaffIdRef = useRef<string>('');
   const [pricingPackages, setPricingPackages] = useState<PricingPackage[]>([]);
   const [showStopConfirmModal, setShowStopConfirmModal] = useState(false);
   const [tableToStop, setTableToStop] = useState<BilliardTable | null>(null);
@@ -333,6 +334,7 @@ const TablesManagement = () => {
         const data = await response.json();
         const defaultId = data.settings?.default_staff_id;
         if (defaultId && defaultId !== '0') {
+          defaultStaffIdRef.current = defaultId;
           setSelectedStaffId(defaultId);
         }
       }
@@ -524,7 +526,7 @@ const TablesManagement = () => {
         const orderResult = await response.json();
         showAlert('success', tAlerts('orderCreatedAddedToBill', { orderNumber: orderResult.orderNumber, tableName: selectedTable.name }));
         clearCart();
-        setSelectedStaffId('');
+        setSelectedStaffId(defaultStaffIdRef.current);
         // Refresh existing orders to show the new order
         if (selectedTable) {
           await fetchExistingOrders(selectedTable.id);

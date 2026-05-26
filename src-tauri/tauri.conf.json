@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "identifier": "com.kugie.chalkboard",
   "build": {
-    "frontendDist": "../.next/standalone",
+    "frontendDist": "frontend",
     "devUrl": "http://localhost:3000",
-    "beforeBuildCommand": "bun run build:desktop && node scripts/clean-tauri-dist.mjs"
+    "beforeBuildCommand": "bun run build:desktop && node scripts/prepare-tauri-server.mjs"
   },
   "app": {
     "windows": [
@@ -40,6 +40,9 @@
     "publisher": "Kugie",
     "copyright": "Copyright © 2024-2026 Kugie. All rights reserved.",
     "category": "Business",
-    "fileAssociations": []
+    "fileAssociations": [],
+    "resources": {
+      "../.next/standalone": "standalone"
+    }
   }
 }

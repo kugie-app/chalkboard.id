@@ -13,11 +13,12 @@ use tauri::{AppHandle, Manager, Runtime, Url};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  let next_server = Arc::new(Mutex::new(None));
+  let next_server: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
   let setup_next_server = Arc::clone(&next_server);
   let shutdown_next_server = Arc::clone(&next_server);
 
   tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![print_receipt_raw])
     .setup(move |app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
@@ -50,6 +51,21 @@ pub fn run() {
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn print_receipt_raw(receipt: String, printer_name: Option<String>) -> Result<(), String> {
+  #[cfg(windows)]
+  {
+    raw_print::print_receipt(receipt, printer_name).map_err(|error| error.to_string())
+  }
+
+  #[cfg(not(windows))]
+  {
+    let _ = receipt;
+    let _ = printer_name;
+    Err("Raw receipt printing is only supported on Windows desktop".to_string())
+  }
 }
 
 fn start_next_server<R: Runtime>(
@@ -89,6 +105,156 @@ fn start_next_server<R: Runtime>(
   }
 
   Ok(())
+}
+
+#[cfg(windows)]
+mod raw_print {
+  use std::{
+    ffi::{c_void, OsStr},
+    os::windows::ffi::OsStrExt,
+    ptr::null_mut,
+  };
+
+  use windows_sys::Win32::{
+    Foundation::HANDLE,
+    Graphics::Printing::{
+      ClosePrinter, EndDocPrinter, EndPagePrinter, GetDefaultPrinterW, OpenPrinterW,
+      StartDocPrinterW, StartPagePrinter, WritePrinter, DOC_INFO_1W,
+    },
+  };
+
+  pub fn print_receipt(
+    receipt: String,
+    printer_name: Option<String>,
+  ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let target_printer = match printer_name {
+      Some(name) if !name.trim().is_empty() => name,
+      _ => default_printer()?,
+    };
+
+    let mut bytes = escpos_receipt_bytes(&receipt);
+    if let Err(error) = raw_write(&target_printer, &mut bytes) {
+      let fallback_printer = default_printer()?;
+      if fallback_printer == target_printer {
+        return Err(error);
+      }
+      raw_write(&fallback_printer, &mut bytes)?;
+    }
+    Ok(())
+  }
+
+  fn escpos_receipt_bytes(receipt: &str) -> Vec<u8> {
+    let normalized = receipt.replace("\r\n", "\n").replace('\r', "\n");
+    let mut bytes = Vec::with_capacity(normalized.len() + 32);
+
+    bytes.extend_from_slice(&[0x1b, 0x40]); // Initialize printer.
+    bytes.extend_from_slice(&[0x1b, 0x61, 0x01]); // Center.
+    bytes.extend_from_slice(&[0x1b, 0x45, 0x01]); // Bold on.
+
+    for line in normalized.lines() {
+      let trimmed = line.trim_end();
+      if is_separator(trimmed) {
+        bytes.extend_from_slice(&[0x1b, 0x45, 0x00]);
+        bytes.extend_from_slice(trimmed.as_bytes());
+        bytes.extend_from_slice(b"\n");
+        bytes.extend_from_slice(&[0x1b, 0x45, 0x01]);
+      } else {
+        bytes.extend_from_slice(trimmed.as_bytes());
+        bytes.extend_from_slice(b"\n");
+      }
+    }
+
+    bytes.extend_from_slice(&[0x1b, 0x45, 0x00]); // Bold off.
+    bytes.extend_from_slice(b"\n\n");
+    bytes.extend_from_slice(&[0x1d, 0x56, 0x42, 0x00]); // Partial cut when supported.
+    bytes
+  }
+
+  fn is_separator(line: &str) -> bool {
+    !line.is_empty() && line.chars().all(|ch| ch == '-' || ch == '=')
+  }
+
+  fn raw_write(
+    printer_name: &str,
+    bytes: &mut [u8],
+  ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let mut printer_handle: HANDLE = null_mut();
+    let mut printer_name_wide = wide_null(printer_name);
+
+    if unsafe { OpenPrinterW(printer_name_wide.as_mut_ptr(), &mut printer_handle, null_mut()) } == 0 {
+      return Err(format!("Failed to open printer '{printer_name}'").into());
+    }
+
+    let mut doc_name = wide_null("Chalkboard Receipt");
+    let mut data_type = wide_null("RAW");
+    let doc_info = DOC_INFO_1W {
+      pDocName: doc_name.as_mut_ptr(),
+      pOutputFile: null_mut(),
+      pDatatype: data_type.as_mut_ptr(),
+    };
+
+    let result = unsafe {
+      let doc_started = StartDocPrinterW(
+        printer_handle,
+        1,
+        &doc_info as *const DOC_INFO_1W,
+      );
+      if doc_started == 0 {
+        ClosePrinter(printer_handle);
+        return Err("Failed to start printer document".into());
+      }
+
+      if StartPagePrinter(printer_handle) == 0 {
+        EndDocPrinter(printer_handle);
+        ClosePrinter(printer_handle);
+        return Err("Failed to start printer page".into());
+      }
+
+      let mut written = 0;
+      let write_ok = WritePrinter(
+        printer_handle,
+        bytes.as_mut_ptr() as *mut c_void,
+        bytes.len() as u32,
+        &mut written,
+      );
+
+      EndPagePrinter(printer_handle);
+      EndDocPrinter(printer_handle);
+      ClosePrinter(printer_handle);
+
+      write_ok != 0 && written as usize == bytes.len()
+    };
+
+    if !result {
+      return Err("Failed to write complete receipt to printer".into());
+    }
+
+    Ok(())
+  }
+
+  fn default_printer() -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    let mut needed = 0;
+    unsafe {
+      GetDefaultPrinterW(null_mut(), &mut needed);
+    }
+
+    if needed == 0 {
+      return Err("No default Windows printer is configured".into());
+    }
+
+    let mut buffer = vec![0u16; needed as usize];
+    let ok = unsafe { GetDefaultPrinterW(buffer.as_mut_ptr(), &mut needed) };
+    if ok == 0 {
+      return Err("Failed to read default Windows printer".into());
+    }
+
+    let end = buffer.iter().position(|&ch| ch == 0).unwrap_or(buffer.len());
+    Ok(String::from_utf16_lossy(&buffer[..end]))
+  }
+
+  fn wide_null(value: &str) -> Vec<u16> {
+    OsStr::new(value).encode_wide().chain(Some(0)).collect()
+  }
 }
 
 fn find_available_port() -> std::io::Result<u16> {

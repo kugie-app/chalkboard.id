@@ -33,7 +33,7 @@ Native desktop application powered by [Tauri v2](https://v2.tauri.app/) with an 
 | **macOS (Apple Silicon)** | `.dmg` |
 | **macOS (Intel)** | `.dmg` |
 | **Windows** | `.msi` or `.exe` (NSIS) |
-| **Linux** | `.deb`, `.AppImage`, `.rpm` |
+| **Linux** | `.deb` or `.rpm` |
 
 1. Download the installer for your platform from the latest release
 2. Install and launch — the embedded PGlite database is set up automatically

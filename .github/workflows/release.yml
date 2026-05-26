@@ -170,7 +170,7 @@ jobs:
           echo "- **macOS (Apple Silicon):** \`.dmg\` (aarch64)" >> CHANGELOG.md
           echo "- **macOS (Intel):** \`.dmg\` (x86_64)" >> CHANGELOG.md
           echo "- **Windows:** \`.msi\` or \`.exe\` (NSIS)" >> CHANGELOG.md
-          echo "- **Linux:** \`.deb\`, \`.AppImage\`, or \`.rpm\`" >> CHANGELOG.md
+          echo "- **Linux:** \`.deb\` or \`.rpm\`" >> CHANGELOG.md
 
       - name: Update release from draft to published
         uses: softprops/action-gh-release@v1

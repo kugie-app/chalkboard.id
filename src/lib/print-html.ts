@@ -112,21 +112,70 @@ const tryTauriRawPrint = async (html: string) => {
 
 const browserPrint = async (html: string, options: PrintHtmlOptions) => {
   await new Promise<void>((resolve, reject) => {
-    const printWindow = window.open("", "_blank", "width=360,height=640");
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("aria-hidden", "true");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    iframe.style.visibility = "hidden";
 
-    if (!printWindow) {
-      reject(new Error("Print window was blocked"));
-      return;
-    }
+    let settled = false;
 
-    printWindow.document.open();
-    printWindow.document.write(html);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-    options.onAfterPrint?.();
-    resolve();
+    const cleanup = () => {
+      iframe.onload = null;
+      if (iframe.parentNode) {
+        iframe.parentNode.removeChild(iframe);
+      }
+    };
+
+    const finish = (error?: unknown) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      options.onAfterPrint?.();
+      resolve();
+    };
+
+    iframe.onload = () => {
+      const printWindow = iframe.contentWindow;
+
+      if (!printWindow) {
+        finish(new Error("Print frame was not available"));
+        return;
+      }
+
+      const afterPrint = () => {
+        finish();
+      };
+
+      printWindow.addEventListener("afterprint", afterPrint, { once: true });
+
+      window.setTimeout(() => {
+        try {
+          printWindow.focus();
+          printWindow.print();
+
+          // Some desktop webviews do not reliably fire afterprint.
+          window.setTimeout(() => {
+            finish();
+          }, 1500);
+        } catch (error) {
+          finish(error);
+        }
+      }, 300);
+    };
+
+    iframe.srcdoc = html;
+    document.body.appendChild(iframe);
   });
 };
 

@@ -14,6 +14,7 @@ import {
   IconX, IconDownload, IconPrinter
 } from "@tabler/icons-react";
 import DefaultSpinner from "@/components/ui-components/Spinner/DefaultSpinner";
+import { printHtml } from "@/lib/print-html";
 
 interface TableSession {
   id: number;
@@ -331,16 +332,11 @@ const TransactionsPage = () => {
   };
 
   const printReceipt = (payment: Payment, locale: 'en' | 'id') => {
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
-    if (!printWindow) return;
-
     const receiptHtml = generateReceiptHTML(payment, locale);
-    printWindow.document.write(receiptHtml);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
     setShowPrintLanguageModal(false);
+    printHtml(receiptHtml).catch((error) => {
+      console.error('Failed to print receipt', error);
+    });
   };
 
   const generateReceiptHTML = (payment: Payment, locale: 'en' | 'id'): string => {
@@ -423,13 +419,21 @@ const TransactionsPage = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Receipt - ${payment.transactionNumber}</title>
         <style>
+          @page {
+            size: 80mm auto;
+            margin: 0;
+          }
           body {
             font-family: 'Courier New', monospace;
-            max-width: 300px;
+            width: 72mm;
+            max-width: 72mm;
+            box-sizing: border-box;
             margin: 0 auto;
             padding: 10px;
             font-size: 12px;
             line-height: 1.4;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
           .header {
             text-align: center;
@@ -499,7 +503,13 @@ const TransactionsPage = () => {
             padding-top: 10px;
           }
           @media print {
-            body { margin: 0; padding: 5px; }
+            html, body {
+              width: 80mm;
+            }
+            body {
+              margin: 0;
+              padding: 4mm;
+            }
             .no-print { display: none; }
           }
         </style>

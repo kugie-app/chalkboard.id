@@ -31,6 +31,7 @@ import MoveSessionModal from "@/components/tables/MoveSessionModal";
 import EnhancedBillingModal from "@/components/tables/EnhancedBillingModal";
 import { PricingPackage } from "@/schema";
 import { calculateTax as calculateTaxFromSettings, formatTaxLabel } from "@/lib/tax";
+import { printHtml } from "@/lib/print-html";
 
 // Helper function to format currency
 const formatCurrency = (amount: number | string) => {
@@ -862,7 +863,8 @@ const TablesManagement = () => {
             <meta charset="UTF-8">
             <title>Receipt - ${paymentData.transactionNumber}</title>
             <style>
-              body { font-family: 'Courier New', monospace; max-width: 300px; margin: 0 auto; padding: 10px; font-size: 12px; line-height: 1.4; }
+              @page { size: 80mm auto; margin: 0; }
+              body { font-family: 'Courier New', monospace; width: 72mm; max-width: 72mm; box-sizing: border-box; margin: 0 auto; padding: 10px; font-size: 12px; line-height: 1.4; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
               .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
               .header h1 { margin: 0; font-size: 16px; font-weight: bold; }
               .header p { margin: 2px 0; font-size: 10px; }
@@ -873,7 +875,7 @@ const TablesManagement = () => {
               .subtotal-row { display: flex; justify-content: space-between; margin: 2px 0; }
               .total-row { display: flex; justify-content: space-between; font-weight: bold; margin: 5px 0 2px 0; border-top: 1px solid #000; padding-top: 3px; }
               .footer { text-align: center; margin-top: 15px; font-size: 10px; border-top: 2px dashed #000; padding-top: 10px; }
-              @media print { body { margin: 0; padding: 5px; } }
+              @media print { html, body { width: 80mm; } body { margin: 0; padding: 4mm; } }
             </style>
           </head><body>
             <div class="header">
@@ -932,14 +934,9 @@ const TablesManagement = () => {
           </body></html>
         `;
 
-        const printWindow = window.open('', '_blank', 'width=800,height=600');
-        if (printWindow) {
-          printWindow.document.write(receiptHtml);
-          printWindow.document.close();
-          printWindow.focus();
-          printWindow.print();
-          printWindow.close();
-        }
+        printHtml(receiptHtml).catch((error) => {
+          console.error('Failed to print receipt', error);
+        });
       })
       .catch(() => {
         // Silently fail on receipt — payment was already saved
